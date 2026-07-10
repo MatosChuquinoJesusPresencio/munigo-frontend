@@ -10,9 +10,8 @@ export default function Header() {
     <header className="border-b border-border bg-white">
       <div className="mx-auto flex h-25 max-w-5xl items-center justify-between px-4">
         <Link to="/" className="flex items-center">
-          <div className="flex items-center gap-2 px-3 py-1.5">
-            <img src="/logo.png" alt="" className="h-25" />
-            <span className="text-lg font-bold text-primary">MuniGO</span>
+          <div className="px-3 py-1.5">
+            <img src="/logo.png" alt="MuniGO" className="h-25" />
           </div>
         </Link>
 
