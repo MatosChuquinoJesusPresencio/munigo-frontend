@@ -8,12 +8,12 @@ export default function Header() {
 
   return (
     <header className="bg-primary">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2 text-lg font-semibold text-white">
-          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-          </svg>
-          Munigo
+      <div className="mx-auto flex h-25 max-w-5xl items-center justify-between px-4">
+        <Link to="/" className="flex items-center">
+          <div className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5">
+            <img src="/logo.png" alt="" className="h-25" />
+            <span className="text-lg font-bold text-primary">MuniGO</span>
+          </div>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
@@ -38,7 +38,7 @@ export default function Header() {
               </Link>
               <Link
                 to="/register"
-                className="rounded-md bg-white px-4 py-2 text-sm font-medium text-primary transition hover:bg-white/90"
+                className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-600"
               >
                 Registrarse
               </Link>
@@ -94,7 +94,7 @@ export default function Header() {
                 <Link
                   to="/register"
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-md bg-white px-4 py-2 text-center text-sm font-medium text-primary transition hover:bg-white/90"
+                  className="rounded-md bg-accent px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-orange-600"
                 >
                   Registrarse
                 </Link>
