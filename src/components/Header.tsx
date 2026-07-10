@@ -7,24 +7,24 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <header className="bg-primary">
+    <header className="border-b border-border bg-white">
       <div className="mx-auto flex h-25 max-w-5xl items-center justify-between px-4">
         <Link to="/" className="flex items-center">
-          <div className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5">
+          <div className="flex items-center gap-2 px-3 py-1.5">
             <img src="/logo.png" alt="" className="h-25" />
             <span className="text-lg font-bold text-primary">MuniGO</span>
           </div>
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
-          <Link to="/" className="text-sm text-white/80 transition hover:text-white">
+          <Link to="/" className="text-sm font-semibold text-txt transition hover:text-primary">
             Inicio
           </Link>
 
           {isAuthenticated ? (
             <button
               onClick={() => logout()}
-              className="rounded-md border border-white/30 px-4 py-2 text-sm text-white transition hover:border-white/60 hover:bg-white/10"
+              className="rounded-md border border-border px-4 py-2 text-sm text-txt transition hover:bg-surface"
             >
               Cerrar sesión
             </button>
@@ -32,13 +32,13 @@ export default function Header() {
             <div className="flex items-center gap-3">
               <Link
                 to="/login"
-                className="rounded-md border border-white/30 px-4 py-2 text-sm text-white transition hover:border-white/60 hover:bg-white/10"
+                className="rounded-md border border-border px-4 py-2 text-sm text-txt transition hover:bg-surface"
               >
                 Iniciar sesión
               </Link>
               <Link
                 to="/register"
-                className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-600"
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-hover"
               >
                 Registrarse
               </Link>
@@ -48,7 +48,7 @@ export default function Header() {
 
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="flex h-10 w-10 items-center justify-center rounded-md text-white transition hover:bg-white/10 md:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-md text-txt transition hover:bg-surface md:hidden"
           aria-label="Menú"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -62,12 +62,12 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <div className="border-t border-white/10 bg-primary px-4 py-4 md:hidden">
+        <div className="border-t border-border bg-white px-4 py-4 md:hidden">
           <nav className="flex flex-col gap-3">
             <Link
               to="/"
               onClick={() => setMenuOpen(false)}
-              className="text-sm text-white/80 transition hover:text-white"
+              className="text-sm font-semibold text-txt transition hover:text-primary"
             >
               Inicio
             </Link>
@@ -78,7 +78,7 @@ export default function Header() {
                   setMenuOpen(false)
                   logout()
                 }}
-                className="w-full rounded-md border border-white/30 px-4 py-2 text-left text-sm text-white transition hover:bg-white/10"
+                className="w-full rounded-md border border-border px-4 py-2 text-left text-sm text-txt transition hover:bg-surface"
               >
                 Cerrar sesión
               </button>
@@ -87,14 +87,14 @@ export default function Header() {
                 <Link
                   to="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-md border border-white/30 px-4 py-2 text-sm text-white transition hover:bg-white/10"
+                  className="rounded-md border border-border px-4 py-2 text-sm text-txt transition hover:bg-surface"
                 >
                   Iniciar sesión
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-md bg-accent px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-orange-600"
+                  className="rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-white transition hover:bg-primary-hover"
                 >
                   Registrarse
                 </Link>

@@ -106,7 +106,7 @@ export default function Home() {
               </Link>
               <Link
                 to="/register"
-                className="rounded-md bg-white px-6 py-3 text-sm font-medium text-[#1C1C1E] transition hover:bg-white/90"
+                className="rounded-md bg-accent px-6 py-3 text-sm font-medium text-white transition hover:bg-orange-600"
               >
                 Crear cuenta
               </Link>
@@ -173,7 +173,7 @@ export default function Home() {
       </section>
 
       {/* Stats */}
-      <section className="bg-accent py-16">
+      <section className="bg-primary py-16">
         <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-4 md:grid-cols-4">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
