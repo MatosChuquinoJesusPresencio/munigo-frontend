@@ -48,3 +48,7 @@ export async function refreshTokens(refresh: string): Promise<AuthTokens> {
   storeTokens(tokens)
   return tokens
 }
+
+export async function getMe(): Promise<User> {
+  return apiRequest<User>('/auth/me/')
+}

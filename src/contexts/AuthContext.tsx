@@ -1,10 +1,11 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import type { LoginRequest, RegisterRequest } from '../types/auth'
+import type { LoginRequest, RegisterRequest, User } from '../types/auth'
 import * as authService from '../lib/auth.service'
 import { getAccessToken } from '../lib/api'
 
 interface AuthContextValue {
+  user: User | null
   isAuthenticated: boolean
   isLoading: boolean
   error: string | null
@@ -17,15 +18,30 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!getAccessToken())
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (isAuthenticated && !user) {
+      authService
+        .getMe()
+        .then(setUser)
+        .catch(() => {
+          setIsAuthenticated(false)
+          setUser(null)
+        })
+    }
+  }, [isAuthenticated, user])
 
   const login = useCallback(async (data: LoginRequest) => {
     setIsLoading(true)
     setError(null)
     try {
       await authService.login(data)
+      const me = await authService.getMe()
+      setUser(me)
       setIsAuthenticated(true)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error al iniciar sesión'
@@ -56,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.logout()
     } finally {
+      setUser(null)
       setIsAuthenticated(false)
       setIsLoading(false)
     }
@@ -67,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isLoading, error, login, register, logout, clearError }}
+      value={{ user, isAuthenticated, isLoading, error, login, register, logout, clearError }}
     >
       {children}
     </AuthContext.Provider>
