@@ -142,6 +142,7 @@ export default function Organizations() {
     } catch {
       setError('Error al eliminar. Intenta nuevamente.')
     } finally {
+      setDeleteModalOpen(false)
       setDeletingItem(null)
     }
   }
@@ -210,13 +211,14 @@ export default function Organizations() {
                     setEditingCompany(company)
                     setCompanyModalOpen(true)
                   }}
-                  onDelete={() =>
+                  onDelete={() => {
                     setDeletingItem({
                       type: 'company',
                       id: company.id,
                       name: company.business_name,
                     })
-                  }
+                    setDeleteModalOpen(true)
+                  }}
                 />
               ))}
             </div>
@@ -255,13 +257,14 @@ export default function Organizations() {
                         setEditingEstablishment(est)
                         setEstablishmentModalOpen(true)
                       }}
-                      onDelete={() =>
+                      onDelete={() => {
                         setDeletingItem({
                           type: 'establishment',
                           id: est.id,
                           name: est.name,
                         })
-                      }
+                        setDeleteModalOpen(true)
+                      }}
                     />
                   ))}
                 </div>
@@ -272,25 +275,19 @@ export default function Organizations() {
       )}
 
       <CompanyModal
-        key={editingCompany?.id ?? 'new'}
+        key={companyModalOpen ? (editingCompany?.id ?? 'new') : 'closed'}
         isOpen={companyModalOpen}
         company={editingCompany}
-        onClose={() => {
-          setCompanyModalOpen(false)
-          setEditingCompany(null)
-        }}
+        onClose={() => setCompanyModalOpen(false)}
         onSubmit={handleCompanySubmit}
       />
 
       <EstablishmentModal
-        key={editingEstablishment?.id ?? 'new'}
+        key={establishmentModalOpen ? (editingEstablishment?.id ?? 'new') : 'closed'}
         isOpen={establishmentModalOpen}
         establishment={editingEstablishment}
         companyId={selectedCompanyId ?? 0}
-        onClose={() => {
-          setEstablishmentModalOpen(false)
-          setEditingEstablishment(null)
-        }}
+        onClose={() => setEstablishmentModalOpen(false)}
         onSubmit={handleEstablishmentSubmit}
       />
 
