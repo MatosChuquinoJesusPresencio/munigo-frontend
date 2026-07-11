@@ -2,9 +2,11 @@ import { Link } from 'react-router'
 
 export default function Appointments() {
   return (
-    <div className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="mb-2 text-2xl font-semibold text-txt">Mis Citas</h1>
-      <p className="mb-8 text-txt-muted">Gestiona tus citas aquí</p>
+    <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-txt">Mis Citas</h1>
+        <p className="text-sm text-txt-muted">Gestiona tus citas aquí</p>
+      </div>
 
       <div className="rounded-lg border border-border bg-white p-8 text-center shadow-sm">
         <svg className="mx-auto mb-4 h-12 w-12 text-txt-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
