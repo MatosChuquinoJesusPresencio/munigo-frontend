@@ -183,10 +183,11 @@ export default function Organizations() {
 
   async function handleDelete() {
     if (!deletingItem) return
+    const prevSelectedId = selectedCompanyId
 
     if (deletingItem.type === 'company') {
       await deleteCompany(deletingItem.id)
-      if (selectedCompanyId === deletingItem.id) {
+      if (prevSelectedId === deletingItem.id) {
         setSelectedCompanyId(null)
         setSelectedEstablishments([])
       }
@@ -195,8 +196,8 @@ export default function Organizations() {
     }
     const refreshed = await getCompanies()
     setCompanies(refreshed)
-    if (selectedCompanyId !== null) {
-      const company = await getCompanyById(selectedCompanyId)
+    if (prevSelectedId !== null && prevSelectedId !== deletingItem.id) {
+      const company = await getCompanyById(prevSelectedId)
       setSelectedEstablishments(company.establishments ?? [])
     }
     setDeletingItem(null)
