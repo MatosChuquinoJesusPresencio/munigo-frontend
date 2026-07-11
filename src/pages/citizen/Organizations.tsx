@@ -247,7 +247,7 @@ export default function Organizations() {
         </div>
       )}
 
-      <section className="mb-8 rounded-lg border border-border bg-white p-4">
+      <section className="relative mb-8 rounded-lg border border-border bg-white p-4">
         <h2 className="mb-3 text-sm font-semibold text-txt">Buscar empresa existente</h2>
         <div className="flex gap-3">
           <input
@@ -265,7 +265,7 @@ export default function Organizations() {
           <p className="mt-2 text-sm text-txt-muted">Buscando...</p>
         )}
         {searchResults.length > 0 && (
-          <ul className="mt-3 divide-y divide-border rounded-md border border-border">
+          <ul className="absolute left-0 right-0 top-full z-10 mt-1 divide-y divide-border rounded-md border border-border bg-white shadow-lg">
             {searchResults.map((company) => (
               <li key={company.id} className="flex items-center justify-between px-4 py-3">
                 <div>
