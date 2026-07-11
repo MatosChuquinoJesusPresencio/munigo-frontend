@@ -5,10 +5,12 @@ import Home from './pages/home/Home'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Appointments from './pages/citizen/Appointments'
+import Organizations from './pages/citizen/Organizations'
 import Panel from './pages/employee/Panel'
 import NotFound from './pages/errors/NotFound'
 import Unauthorized from './pages/errors/Unauthorized'
 import ProtectedRoute from './components/ProtectedRoute'
+import GuestRoute from './components/GuestRoute'
 import { UserRole } from './types/auth'
 
 function App() {
@@ -22,14 +24,20 @@ function App() {
           <Route path="/appointments" element={<Appointments />} />
         </Route>
 
+        <Route element={<ProtectedRoute allowedRoles={[UserRole.CITIZEN]} />}>
+          <Route path="/organizations" element={<Organizations />} />
+        </Route>
+
         <Route element={<ProtectedRoute allowedRoles={[UserRole.EMPLOYEE]} />}>
           <Route path="/panel" element={<Panel />} />
         </Route>
       </Route>
 
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+      <Route element={<GuestRoute />}>
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<NotFound />} />

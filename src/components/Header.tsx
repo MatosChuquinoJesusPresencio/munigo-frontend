@@ -29,6 +29,14 @@ export default function Header() {
               >
                 {user?.role === UserRole.EMPLOYEE ? 'Panel' : 'Mis Citas'}
               </Link>
+              {user?.role === UserRole.CITIZEN && (
+                <Link
+                  to="/organizations"
+                  className="text-sm font-semibold text-txt transition hover:text-primary"
+                >
+                  Mis Empresas
+                </Link>
+              )}
               <button
                 onClick={() => logout()}
                 className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-red-600 transition hover:bg-red-50"
@@ -93,6 +101,15 @@ export default function Header() {
                 >
                   {user?.role === UserRole.EMPLOYEE ? 'Panel' : 'Mis Citas'}
                 </Link>
+                {user?.role === UserRole.CITIZEN && (
+                  <Link
+                    to="/organizations"
+                    onClick={() => setMenuOpen(false)}
+                    className="text-sm font-semibold text-txt transition hover:text-primary"
+                  >
+                    Mis Empresas
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     setMenuOpen(false)
