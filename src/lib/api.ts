@@ -1,6 +1,8 @@
 import type { AuthTokens } from '../types/auth'
 
-const API_BASE = '/api'
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api'
 
 function getAccessToken(): string | null {
   return localStorage.getItem('access_token')
