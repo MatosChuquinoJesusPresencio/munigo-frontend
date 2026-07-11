@@ -15,6 +15,8 @@ export default function CompanyCard({
   onEdit,
   onDelete,
 }: CompanyCardProps) {
+  const establishmentCount = company.establishments_count ?? company.establishments?.length ?? 0
+
   return (
     <div
       className={`rounded-lg border bg-white p-5 shadow-sm transition ${
@@ -28,7 +30,7 @@ export default function CompanyCard({
 
       <div className="mb-4">
         <span className="inline-block rounded-full bg-surface px-3 py-1 text-xs font-medium text-txt-muted">
-          {company.establishments.length} establecimiento{company.establishments.length !== 1 ? 's' : ''}
+          {establishmentCount} establecimiento{establishmentCount !== 1 ? 's' : ''}
         </span>
       </div>
 

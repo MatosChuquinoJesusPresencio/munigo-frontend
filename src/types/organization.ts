@@ -46,8 +46,9 @@ export interface Company {
   id: number
   business_name: string
   ruc: string
-  citizens: number[]
-  establishments: Establishment[]
+  citizens?: number[]
+  establishments?: Establishment[]
+  establishments_count?: number
 }
 
 export interface CreateCompanyRequest {

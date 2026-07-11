@@ -13,6 +13,22 @@ export async function getCompanyById(id: number): Promise<Company> {
   return apiRequest<Company>(`/organizations/companies/${id}/`)
 }
 
+export async function searchCompanies(query: string): Promise<Company[]> {
+  const params = new URLSearchParams({ q: query })
+  return apiRequest<Company[]>(`/organizations/companies/search/?${params}`)
+}
+
+export async function addCitizenToCompany(
+  companyId: number,
+): Promise<{ detail: string }> {
+  return apiRequest<{ detail: string }>(
+    `/organizations/companies/${companyId}/add_citizen/`,
+    {
+      method: 'POST',
+    },
+  )
+}
+
 export async function createCompany(
   data: CreateCompanyRequest,
 ): Promise<Company> {

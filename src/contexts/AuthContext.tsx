@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 import type { ReactNode } from 'react'
 import type { LoginRequest, RegisterRequest, User } from '../types/auth'
 import * as authService from '../lib/auth.service'
-import { getAccessToken } from '../lib/api'
+import { getAccessToken, ApiClientError } from '../lib/api'
 
 interface AuthContextValue {
   user: User | null
@@ -16,6 +16,20 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
+
+function extractErrorMessage(err: unknown): string {
+  if (err instanceof ApiClientError) {
+    const data = err.data
+    if (typeof data.detail === 'string') return data.detail
+    const firstField = Object.values(data)[0]
+    if (Array.isArray(firstField) && typeof firstField[0] === 'string') {
+      return firstField[0]
+    }
+    return 'Ocurrió un error. Intenta nuevamente.'
+  }
+  if (err instanceof Error) return err.message
+  return 'Ocurrió un error. Intenta nuevamente.'
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
@@ -52,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(me)
       setIsAuthenticated(true)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al iniciar sesión'
+      const message = extractErrorMessage(err)
       setError(message)
       throw err
     } finally {
@@ -66,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.register(data)
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al registrar'
+      const message = extractErrorMessage(err)
       setError(message)
       throw err
     } finally {

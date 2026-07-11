@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Company, Establishment } from '../../types/organization'
 import {
   getCompanies,
@@ -6,6 +6,8 @@ import {
   createCompany,
   updateCompany,
   deleteCompany,
+  searchCompanies,
+  addCitizenToCompany,
 } from '../../lib/company.service'
 import {
   createEstablishment,
@@ -38,6 +40,65 @@ export default function Organizations() {
     name: string
   } | null>(null)
 
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<Company[]>([])
+  const [searching, setSearching] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
+  const [joiningCompanyId, setJoiningCompanyId] = useState<number | null>(null)
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const doSearch = useCallback(async (query: string) => {
+    const trimmed = query.trim()
+    if (!trimmed) {
+      setSearchResults([])
+      setSearching(false)
+      return
+    }
+    try {
+      setSearching(true)
+      setSearchError(null)
+      const results = await searchCompanies(trimmed)
+      setSearchResults(results)
+    } catch {
+      setSearchError('Error al buscar empresas.')
+    } finally {
+      setSearching(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (searchTimeout.current) clearTimeout(searchTimeout.current)
+    const trimmed = searchQuery.trim()
+    if (!trimmed) {
+      searchTimeout.current = setTimeout(() => {
+        setSearchResults([])
+        setSearching(false)
+      }, 0)
+      return () => {
+        if (searchTimeout.current) clearTimeout(searchTimeout.current)
+      }
+    }
+    searchTimeout.current = setTimeout(() => doSearch(searchQuery), 350)
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current)
+    }
+  }, [searchQuery, doSearch])
+
+  async function handleJoinCompany(companyId: number) {
+    try {
+      setJoiningCompanyId(companyId)
+      await addCitizenToCompany(companyId)
+      setSearchQuery('')
+      setSearchResults([])
+      const refreshed = await getCompanies()
+      setCompanies(refreshed)
+    } catch {
+      setSearchError('Error al asociarse a la empresa.')
+    } finally {
+      setJoiningCompanyId(null)
+    }
+  }
+
   useEffect(() => {
     let cancelled = false
     async function load() {
@@ -62,7 +123,7 @@ export default function Organizations() {
     async function load() {
       try {
         const company = await getCompanyById(selectedCompanyId!)
-        if (!cancelled) setSelectedEstablishments(company.establishments)
+        if (!cancelled) setSelectedEstablishments(company.establishments ?? [])
       } catch {
         if (!cancelled) setError('Error al cargar los establecimientos.')
       }
@@ -84,7 +145,7 @@ export default function Organizations() {
       setEditingCompany(null)
       if (selectedCompanyId === editingCompany.id) {
         const updated = await getCompanyById(editingCompany.id)
-        setSelectedEstablishments(updated.establishments)
+        setSelectedEstablishments(updated.establishments ?? [])
       }
     } else {
       const created = await createCompany(data)
@@ -114,7 +175,7 @@ export default function Organizations() {
     }
     if (selectedCompanyId !== null) {
       const company = await getCompanyById(selectedCompanyId)
-      setSelectedEstablishments(company.establishments)
+      setSelectedEstablishments(company.establishments ?? [])
       const refreshed = await getCompanies()
       setCompanies(refreshed)
     }
@@ -137,7 +198,7 @@ export default function Organizations() {
       setCompanies(refreshed)
       if (selectedCompanyId !== null) {
         const company = await getCompanyById(selectedCompanyId)
-        setSelectedEstablishments(company.establishments)
+        setSelectedEstablishments(company.establishments ?? [])
       }
     } catch {
       setError('Error al eliminar. Intenta nuevamente.')
@@ -185,6 +246,49 @@ export default function Organizations() {
           </button>
         </div>
       )}
+
+      <section className="mb-8 rounded-lg border border-border bg-white p-4">
+        <h2 className="mb-3 text-sm font-semibold text-txt">Buscar empresa existente</h2>
+        <div className="flex gap-3">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Nombre o RUC de la empresa..."
+            className="flex-1 rounded-md border border-border px-3 py-2 text-sm text-txt placeholder:text-txt-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </div>
+        {searchError && (
+          <p className="mt-2 text-sm text-red-600">{searchError}</p>
+        )}
+        {searching && (
+          <p className="mt-2 text-sm text-txt-muted">Buscando...</p>
+        )}
+        {searchResults.length > 0 && (
+          <ul className="mt-3 divide-y divide-border rounded-md border border-border">
+            {searchResults.map((company) => (
+              <li key={company.id} className="flex items-center justify-between px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium text-txt">{company.business_name}</p>
+                  <p className="text-xs text-txt-muted">RUC: {company.ruc}</p>
+                </div>
+                <button
+                  onClick={() => handleJoinCompany(company.id)}
+                  disabled={joiningCompanyId === company.id}
+                  className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white transition hover:bg-primary-hover disabled:opacity-50"
+                >
+                  {joiningCompanyId === company.id ? 'Asociando...' : 'Asociarse'}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        {searchQuery.trim() && !searching && searchResults.length === 0 && !searchError && (
+          <p className="mt-2 text-sm text-txt-muted">
+            No se encontraron empresas con ese nombre o RUC.
+          </p>
+        )}
+      </section>
 
       {companies.length === 0 ? (
         <EmptyState onCreateCompany={() => setCompanyModalOpen(true)} />
@@ -275,7 +379,7 @@ export default function Organizations() {
       )}
 
       <CompanyModal
-        key={companyModalOpen ? (editingCompany?.id ?? 'new') : 'closed'}
+        key={companyModalOpen ? (editingCompany?.id ?? 'new') : 'company-closed'}
         isOpen={companyModalOpen}
         company={editingCompany}
         onClose={() => setCompanyModalOpen(false)}
@@ -283,7 +387,7 @@ export default function Organizations() {
       />
 
       <EstablishmentModal
-        key={establishmentModalOpen ? (editingEstablishment?.id ?? 'new') : 'closed'}
+        key={establishmentModalOpen ? (editingEstablishment?.id ?? 'new') : 'establishment-closed'}
         isOpen={establishmentModalOpen}
         establishment={editingEstablishment}
         companyId={selectedCompanyId ?? 0}
