@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router'
 import AuthLayout from './layouts/AuthLayout'
 import MainLayout from './layouts/MainLayout'
+import DashboardLayout from './layouts/DashboardLayout'
 import Home from './pages/home/Home'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
@@ -19,7 +20,9 @@ function App() {
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
+      </Route>
 
+      <Route element={<DashboardLayout />}>
         <Route element={<ProtectedRoute />}>
           <Route path="/appointments" element={<Appointments />} />
         </Route>
