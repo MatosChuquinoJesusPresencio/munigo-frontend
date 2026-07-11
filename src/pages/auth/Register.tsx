@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router'
-import { useAuth } from '../contexts/AuthContext'
-import { DocumentType } from '../types/auth'
+import { useAuth } from '../../contexts/AuthContext'
+import { DocumentType } from '../../types/auth'
 
 export default function Register() {
   const { register, isLoading, error, clearError } = useAuth()

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { useAuth } from '../contexts/AuthContext'
-import { DocumentType } from '../types/auth'
+import { useAuth } from '../../contexts/AuthContext'
+import { DocumentType } from '../../types/auth'
 
 export default function Login() {
   const { login, isLoading, error, clearError } = useAuth()

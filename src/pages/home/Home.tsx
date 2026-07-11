@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { useAuth } from '../contexts/AuthContext'
+import { useAuth } from '../../contexts/AuthContext'
 
 const steps = [
   {
