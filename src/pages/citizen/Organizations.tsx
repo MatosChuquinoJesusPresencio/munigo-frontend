@@ -257,10 +257,14 @@ export default function Organizations() {
           />
         </div>
         {searchError && (
-          <p className="mt-2 text-sm text-red-600">{searchError}</p>
+          <p className="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600 shadow-lg">
+            {searchError}
+          </p>
         )}
         {searching && (
-          <p className="mt-2 text-sm text-txt-muted">Buscando...</p>
+          <p className="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-border bg-white px-3 py-2 text-sm text-txt-muted shadow-lg">
+            Buscando...
+          </p>
         )}
         {searchResults.length > 0 && (
           <ul className="absolute left-0 right-0 top-full z-10 mt-1 divide-y divide-border rounded-md border border-border bg-white shadow-lg">
@@ -282,7 +286,7 @@ export default function Organizations() {
           </ul>
         )}
         {searchQuery.trim() && !searching && searchResults.length === 0 && !searchError && (
-          <p className="mt-2 text-sm text-txt-muted">
+          <p className="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-border bg-white px-3 py-2 text-sm text-txt-muted shadow-lg">
             No se encontraron empresas con ese nombre o RUC.
           </p>
         )}
