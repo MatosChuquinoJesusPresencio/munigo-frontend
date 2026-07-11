@@ -20,19 +20,27 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!getAccessToken())
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(() => !!getAccessToken())
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (isAuthenticated && !user) {
-      authService
-        .getMe()
-        .then(setUser)
-        .catch(() => {
+    if (!isAuthenticated || user) return
+    let cancelled = false
+    authService
+      .getMe()
+      .then((me) => {
+        if (!cancelled) setUser(me)
+      })
+      .catch(() => {
+        if (!cancelled) {
           setIsAuthenticated(false)
           setUser(null)
-        })
-    }
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false)
+      })
+    return () => { cancelled = true }
   }, [isAuthenticated, user])
 
   const login = useCallback(async (data: LoginRequest) => {
