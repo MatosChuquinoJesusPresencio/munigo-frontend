@@ -1,5 +1,5 @@
-import { apiRequest } from './api'
-import type { CaseFile, CreateCaseFileRequest, UpdateCaseFileRequest, Requirement } from '../types/procedure'
+import { apiRequest, apiUpload } from './api'
+import type { CaseFile, CreateCaseFileRequest, UpdateCaseFileRequest, Requirement, ProcedureRequirement } from '../types/procedure'
 
 export const caseFileService = {
   async getAll(): Promise<CaseFile[]> {
@@ -32,5 +32,17 @@ export const caseFileService = {
 
   async getRequirements(procedureType: string): Promise<Requirement[]> {
     return apiRequest<Requirement[]>(`/procedures/requirements/?procedure_type=${procedureType}`)
+  },
+
+  async getCaseFileRequirements(caseFileId: number): Promise<ProcedureRequirement[]> {
+    return apiRequest<ProcedureRequirement[]>(`/procedures/procedure-requirements/?case_file=${caseFileId}`)
+  },
+
+  async uploadDocument(procedureRequirementId: number, file: File, name: string): Promise<void> {
+    const formData = new FormData()
+    formData.append('procedure_requirement', String(procedureRequirementId))
+    formData.append('name', name)
+    formData.append('file', file)
+    return apiUpload<void>('/procedures/attached-documents/', formData)
   },
 }

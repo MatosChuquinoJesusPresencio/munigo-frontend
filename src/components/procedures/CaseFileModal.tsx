@@ -2,13 +2,12 @@ import { useState } from 'react'
 import { ApiClientError } from '../../lib/api'
 import { caseFileService } from '../../lib/case-file.service'
 import { getCompanyById } from '../../lib/company.service'
-import type { CaseFile, ProcedureType } from '../../types/procedure'
+import type { ProcedureType } from '../../types/procedure'
 import { ProcedureTypeLabels } from '../../types/procedure'
 import type { Company, Establishment } from '../../types/organization'
 
 interface CaseFileModalProps {
   isOpen: boolean
-  editingCaseFile?: CaseFile | null
   companies: Company[]
   onClose: () => void
   onSaved: () => void
@@ -16,26 +15,17 @@ interface CaseFileModalProps {
 
 export default function CaseFileModal({
   isOpen,
-  editingCaseFile,
   companies,
   onClose,
   onSaved,
 }: CaseFileModalProps) {
-  const [procedureType, setProcedureType] = useState<ProcedureType | ''>(
-    editingCaseFile?.procedure_type ?? '',
-  )
-  const [companyId, setCompanyId] = useState<number | ''>(
-    editingCaseFile?.establishment ? '' : '',
-  )
-  const [establishmentId, setEstablishmentId] = useState<number | ''>(
-    editingCaseFile?.establishment ?? '',
-  )
+  const [procedureType, setProcedureType] = useState<ProcedureType | ''>('')
+  const [companyId, setCompanyId] = useState<number | ''>('')
+  const [establishmentId, setEstablishmentId] = useState<number | ''>('')
   const [companyEstablishments, setCompanyEstablishments] = useState<Establishment[]>([])
   const [loadingEstablishments, setLoadingEstablishments] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-
-  const isEditing = !!editingCaseFile
 
   if (!isOpen) return null
 
@@ -69,17 +59,10 @@ export default function CaseFileModal({
 
     setLoading(true)
     try {
-      if (isEditing && editingCaseFile) {
-        await caseFileService.update(editingCaseFile.id, {
-          establishment: establishmentId as number,
-          procedure_type: procedureType as ProcedureType,
-        })
-      } else {
-        await caseFileService.create({
-          establishment: establishmentId as number,
-          procedure_type: procedureType as ProcedureType,
-        })
-      }
+      await caseFileService.create({
+        establishment: establishmentId as number,
+        procedure_type: procedureType as ProcedureType,
+      })
       onSaved()
     } catch (err) {
       if (err instanceof ApiClientError) {
@@ -105,9 +88,7 @@ export default function CaseFileModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
       <div className="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <h2 className="mb-4 text-lg font-semibold text-txt">
-          {isEditing ? 'Editar Trámite' : 'Nuevo Trámite'}
-        </h2>
+        <h2 className="mb-4 text-lg font-semibold text-txt">Nuevo Trámite</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -174,7 +155,7 @@ export default function CaseFileModal({
               disabled={loading}
               className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-hover disabled:opacity-50"
             >
-              {loading ? 'Guardando...' : isEditing ? 'Guardar cambios' : 'Crear trámite'}
+              {loading ? 'Creando...' : 'Crear trámite'}
             </button>
           </div>
         </form>

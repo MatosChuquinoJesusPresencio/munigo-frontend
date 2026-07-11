@@ -24,7 +24,6 @@ export default function Tramites() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
-  const [editingCaseFile, setEditingCaseFile] = useState<CaseFile | null>(null)
   const [deletingCaseFile, setDeletingCaseFile] = useState<CaseFile | null>(null)
 
   useEffect(() => {
@@ -61,21 +60,6 @@ export default function Tramites() {
     setCompanies(co)
   }
 
-  function handleEdit(caseFile: CaseFile) {
-    setEditingCaseFile(caseFile)
-    setModalOpen(true)
-  }
-
-  function handleCreate() {
-    setEditingCaseFile(null)
-    setModalOpen(true)
-  }
-
-  function handleCloseModal() {
-    setModalOpen(false)
-    setEditingCaseFile(null)
-  }
-
   async function handleDeleteConfirm() {
     if (!deletingCaseFile) return
     await caseFileService.remove(deletingCaseFile.id)
@@ -92,7 +76,7 @@ export default function Tramites() {
         </div>
         {caseFiles.length > 0 && (
           <button
-            onClick={handleCreate}
+            onClick={() => setModalOpen(true)}
             className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-hover"
           >
             Nuevo Trámite
@@ -105,7 +89,7 @@ export default function Tramites() {
           <p className="text-sm text-txt-muted">Cargando trámites...</p>
         </div>
       ) : caseFiles.length === 0 ? (
-        <CaseFileEmptyState onCreate={handleCreate} />
+        <CaseFileEmptyState onCreate={() => setModalOpen(true)} />
       ) : (
         <>
           <div className="mb-6 flex flex-wrap gap-2">
@@ -129,7 +113,6 @@ export default function Tramites() {
               <CaseFileCard
                 key={cf.id}
                 caseFile={cf}
-                onEdit={() => handleEdit(cf)}
                 onDelete={() => setDeletingCaseFile(cf)}
               />
             ))}
@@ -138,13 +121,11 @@ export default function Tramites() {
       )}
 
       <CaseFileModal
-        key={editingCaseFile?.id ?? 'new'}
         isOpen={modalOpen}
-        editingCaseFile={editingCaseFile}
         companies={companies}
-        onClose={handleCloseModal}
+        onClose={() => setModalOpen(false)}
         onSaved={() => {
-          handleCloseModal()
+          setModalOpen(false)
           reload()
         }}
       />

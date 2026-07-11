@@ -73,6 +73,7 @@ export interface CaseFile {
   procedure_type: ProcedureType
   risk_level: RiskLevel
   status: CaseFileStatus
+  procedure_requirements?: ProcedureRequirement[]
 }
 
 export interface Requirement {
@@ -82,6 +83,22 @@ export interface Requirement {
   allowed_formats: string[]
   is_required: boolean
   procedure_type: ProcedureType
+}
+
+export interface ProcedureRequirement {
+  id: number
+  requirement: Requirement
+  fulfilled: boolean
+  documents: AttachedDocument[]
+}
+
+export interface AttachedDocument {
+  id: number
+  name: string
+  file: string
+  validation_status: 'PENDIENTE' | 'APROBADO' | 'OBSERVADO'
+  observations: string
+  uploaded_at: string
 }
 
 export interface CreateCaseFileRequest {

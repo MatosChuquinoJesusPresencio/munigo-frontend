@@ -6,6 +6,7 @@ import Home from './pages/home/Home'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Tramites from './pages/citizen/Tramites'
+import CaseFileDetail from './pages/citizen/CaseFileDetail'
 import Appointments from './pages/citizen/Appointments'
 import Notifications from './pages/citizen/Notifications'
 import Organizations from './pages/citizen/Organizations'
@@ -27,6 +28,7 @@ function App() {
       <Route element={<DashboardLayout />}>
         <Route element={<ProtectedRoute allowedRoles={[UserRole.CITIZEN]} />}>
           <Route path="/tramites" element={<Tramites />} />
+          <Route path="/tramites/:id" element={<CaseFileDetail />} />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/organizations" element={<Organizations />} />
