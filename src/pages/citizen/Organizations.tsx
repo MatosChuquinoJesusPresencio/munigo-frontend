@@ -184,28 +184,22 @@ export default function Organizations() {
   async function handleDelete() {
     if (!deletingItem) return
 
-    try {
-      if (deletingItem.type === 'company') {
-        await deleteCompany(deletingItem.id)
-        if (selectedCompanyId === deletingItem.id) {
-          setSelectedCompanyId(null)
-          setSelectedEstablishments([])
-        }
-      } else {
-        await deleteEstablishment(deletingItem.id)
+    if (deletingItem.type === 'company') {
+      await deleteCompany(deletingItem.id)
+      if (selectedCompanyId === deletingItem.id) {
+        setSelectedCompanyId(null)
+        setSelectedEstablishments([])
       }
-      const refreshed = await getCompanies()
-      setCompanies(refreshed)
-      if (selectedCompanyId !== null) {
-        const company = await getCompanyById(selectedCompanyId)
-        setSelectedEstablishments(company.establishments ?? [])
-      }
-    } catch {
-      setError('Error al eliminar. Intenta nuevamente.')
-    } finally {
-      setDeleteModalOpen(false)
-      setDeletingItem(null)
+    } else {
+      await deleteEstablishment(deletingItem.id)
     }
+    const refreshed = await getCompanies()
+    setCompanies(refreshed)
+    if (selectedCompanyId !== null) {
+      const company = await getCompanyById(selectedCompanyId)
+      setSelectedEstablishments(company.establishments ?? [])
+    }
+    setDeletingItem(null)
   }
 
   const selectedCompany = companies.find((c) => c.id === selectedCompanyId)

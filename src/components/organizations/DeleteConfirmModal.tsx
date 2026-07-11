@@ -1,3 +1,6 @@
+import { useState } from 'react'
+import { ApiClientError } from '../../lib/api'
+
 interface DeleteConfirmModalProps {
   isOpen: boolean
   title: string
@@ -13,11 +16,31 @@ export default function DeleteConfirmModal({
   onClose,
   onConfirm,
 }: DeleteConfirmModalProps) {
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
   if (!isOpen) return null
 
   async function handleConfirm() {
-    await onConfirm()
-    onClose()
+    setError(null)
+    setLoading(true)
+    try {
+      await onConfirm()
+      onClose()
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        const data = err.data
+        if (typeof data.detail === 'string') {
+          setError(data.detail)
+        } else {
+          setError('Error al eliminar. Intenta nuevamente.')
+        }
+      } else {
+        setError('Error al eliminar. Intenta nuevamente.')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -29,6 +52,12 @@ export default function DeleteConfirmModal({
           <span className="font-medium text-txt">{itemName}</span> permanentemente.
         </p>
 
+        {error && (
+          <div className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
@@ -38,9 +67,10 @@ export default function DeleteConfirmModal({
           </button>
           <button
             onClick={handleConfirm}
-            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700"
+            disabled={loading}
+            className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-700 disabled:opacity-50"
           >
-            Eliminar
+            {loading ? 'Eliminando...' : 'Eliminar'}
           </button>
         </div>
       </div>

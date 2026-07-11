@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Establishment } from '../../types/organization'
 import { BusinessCategory, BusinessCategoryLabels } from '../../types/organization'
+import { ApiClientError } from '../../lib/api'
 
 interface EstablishmentModalProps {
   isOpen: boolean
@@ -66,8 +67,22 @@ export default function EstablishmentModal({
         square_meters: m2,
       })
       onClose()
-    } catch {
-      setError('Ocurrió un error. Intenta nuevamente.')
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        const data = err.data
+        if (typeof data.detail === 'string') {
+          setError(data.detail)
+        } else {
+          const firstField = Object.values(data)[0]
+          if (Array.isArray(firstField) && typeof firstField[0] === 'string') {
+            setError(firstField[0])
+          } else {
+            setError('Ocurrió un error. Intenta nuevamente.')
+          }
+        }
+      } else {
+        setError('Ocurrió un error. Intenta nuevamente.')
+      }
     } finally {
       setLoading(false)
     }

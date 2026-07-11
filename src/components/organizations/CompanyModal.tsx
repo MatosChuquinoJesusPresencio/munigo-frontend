@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Company } from '../../types/organization'
+import { ApiClientError } from '../../lib/api'
 
 interface CompanyModalProps {
   isOpen: boolean
@@ -41,8 +42,22 @@ export default function CompanyModal({
     try {
       await onSubmit({ business_name: businessName.trim(), ruc })
       onClose()
-    } catch {
-      setError('Ocurrió un error. Intenta nuevamente.')
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        const data = err.data
+        if (typeof data.detail === 'string') {
+          setError(data.detail)
+        } else {
+          const firstField = Object.values(data)[0]
+          if (Array.isArray(firstField) && typeof firstField[0] === 'string') {
+            setError(firstField[0])
+          } else {
+            setError('Ocurrió un error. Intenta nuevamente.')
+          }
+        }
+      } else {
+        setError('Ocurrió un error. Intenta nuevamente.')
+      }
     } finally {
       setLoading(false)
     }
