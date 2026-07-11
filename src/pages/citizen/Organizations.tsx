@@ -24,8 +24,8 @@ import EmptyState from '../../components/organizations/EmptyState'
 
 export default function Organizations() {
   const [companies, setCompanies] = useState<Company[]>([])
-  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null)
-  const [selectedEstablishments, setSelectedEstablishments] = useState<Establishment[]>([])
+  const [expandedCompanyId, setExpandedCompanyId] = useState<number | null>(null)
+  const [expandedEstablishments, setExpandedEstablishments] = useState<Establishment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -118,22 +118,27 @@ export default function Organizations() {
   }, [])
 
   useEffect(() => {
-    if (selectedCompanyId === null) return
+    if (expandedCompanyId === null) return
     let cancelled = false
     async function load() {
       try {
-        const company = await getCompanyById(selectedCompanyId!)
-        if (!cancelled) setSelectedEstablishments(company.establishments ?? [])
+        const company = await getCompanyById(expandedCompanyId!)
+        if (!cancelled) setExpandedEstablishments(company.establishments ?? [])
       } catch {
         if (!cancelled) setError('Error al cargar los establecimientos.')
       }
     }
     load()
     return () => { cancelled = true }
-  }, [selectedCompanyId])
+  }, [expandedCompanyId])
 
-  function handleSelectCompany(companyId: number) {
-    setSelectedCompanyId(selectedCompanyId === companyId ? null : companyId)
+  function handleToggleCompany(companyId: number) {
+    if (expandedCompanyId === companyId) {
+      setExpandedCompanyId(null)
+      setExpandedEstablishments([])
+    } else {
+      setExpandedCompanyId(companyId)
+    }
   }
 
   async function handleCompanySubmit(data: {
@@ -143,13 +148,13 @@ export default function Organizations() {
     if (editingCompany) {
       await updateCompany(editingCompany.id, data)
       setEditingCompany(null)
-      if (selectedCompanyId === editingCompany.id) {
+      if (expandedCompanyId === editingCompany.id) {
         const updated = await getCompanyById(editingCompany.id)
-        setSelectedEstablishments(updated.establishments ?? [])
+        setExpandedEstablishments(updated.establishments ?? [])
       }
     } else {
       const created = await createCompany(data)
-      setSelectedCompanyId(created.id)
+      setExpandedCompanyId(created.id)
     }
     const refreshed = await getCompanies()
     setCompanies(refreshed)
@@ -173,9 +178,9 @@ export default function Organizations() {
     } else {
       await createEstablishment(data)
     }
-    if (selectedCompanyId !== null) {
-      const company = await getCompanyById(selectedCompanyId)
-      setSelectedEstablishments(company.establishments ?? [])
+    if (expandedCompanyId !== null) {
+      const company = await getCompanyById(expandedCompanyId)
+      setExpandedEstablishments(company.establishments ?? [])
       const refreshed = await getCompanies()
       setCompanies(refreshed)
     }
@@ -183,27 +188,25 @@ export default function Organizations() {
 
   async function handleDelete() {
     if (!deletingItem) return
-    const prevSelectedId = selectedCompanyId
+    const prevExpandedId = expandedCompanyId
 
     if (deletingItem.type === 'company') {
       await deleteCompany(deletingItem.id)
-      if (prevSelectedId === deletingItem.id) {
-        setSelectedCompanyId(null)
-        setSelectedEstablishments([])
+      if (prevExpandedId === deletingItem.id) {
+        setExpandedCompanyId(null)
+        setExpandedEstablishments([])
       }
     } else {
       await deleteEstablishment(deletingItem.id)
     }
     const refreshed = await getCompanies()
     setCompanies(refreshed)
-    if (prevSelectedId !== null && prevSelectedId !== deletingItem.id) {
-      const company = await getCompanyById(prevSelectedId)
-      setSelectedEstablishments(company.establishments ?? [])
+    if (prevExpandedId !== null && prevExpandedId !== deletingItem.id) {
+      const company = await getCompanyById(prevExpandedId)
+      setExpandedEstablishments(company.establishments ?? [])
     }
     setDeletingItem(null)
   }
-
-  const selectedCompany = companies.find((c) => c.id === selectedCompanyId)
 
   if (loading) {
     return (
@@ -212,9 +215,9 @@ export default function Organizations() {
           <div className="mb-2 h-8 w-48 animate-pulse rounded bg-surface" />
           <div className="h-4 w-64 animate-pulse rounded bg-surface" />
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="flex flex-col gap-3">
           {[1, 2].map((i) => (
-            <div key={i} className="h-40 animate-pulse rounded-lg bg-surface" />
+            <div key={i} className="h-20 animate-pulse rounded-lg bg-surface" />
           ))}
         </div>
       </div>
@@ -288,89 +291,86 @@ export default function Organizations() {
       {companies.length === 0 ? (
         <EmptyState onCreateCompany={() => setCompanyModalOpen(true)} />
       ) : (
-        <>
-          <section className="mb-8">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-txt">Empresas</h2>
-              <button
-                onClick={() => setCompanyModalOpen(true)}
-                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-hover"
+        <section>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-txt">Empresas</h2>
+            <button
+              onClick={() => setCompanyModalOpen(true)}
+              className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-hover"
+            >
+              + Nueva empresa
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {companies.map((company) => (
+              <CompanyCard
+                key={company.id}
+                company={company}
+                isExpanded={expandedCompanyId === company.id}
+                onToggle={() => handleToggleCompany(company.id)}
+                onEdit={() => {
+                  setEditingCompany(company)
+                  setCompanyModalOpen(true)
+                }}
+                onDelete={() => {
+                  setDeletingItem({
+                    type: 'company',
+                    id: company.id,
+                    name: company.business_name,
+                  })
+                  setDeleteModalOpen(true)
+                }}
               >
-                + Nueva empresa
-              </button>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              {companies.map((company) => (
-                <CompanyCard
-                  key={company.id}
-                  company={company}
-                  isSelected={selectedCompanyId === company.id}
-                  onSelect={() => handleSelectCompany(company.id)}
-                  onEdit={() => {
-                    setEditingCompany(company)
-                    setCompanyModalOpen(true)
-                  }}
-                  onDelete={() => {
-                    setDeletingItem({
-                      type: 'company',
-                      id: company.id,
-                      name: company.business_name,
-                    })
-                    setDeleteModalOpen(true)
-                  }}
-                />
-              ))}
-            </div>
-          </section>
+                {expandedCompanyId === company.id && (
+                  <>
+                    <div className="mb-3 flex items-center justify-between">
+                      <h3 className="text-sm font-medium text-txt">Establecimientos</h3>
+                      <button
+                        onClick={() => {
+                          setEditingEstablishment(null)
+                          setEstablishmentModalOpen(true)
+                        }}
+                        className="rounded-md bg-accent px-3 py-1.5 text-xs font-medium text-white transition hover:bg-orange-600"
+                      >
+                        + Nuevo
+                      </button>
+                    </div>
 
-          {selectedCompanyId !== null && selectedCompany && (
-            <section>
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-txt">
-                  Establecimientos de {selectedCompany.business_name}
-                </h2>
-                <button
-                  onClick={() => {
-                    setEditingEstablishment(null)
-                    setEstablishmentModalOpen(true)
-                  }}
-                  className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-600"
-                >
-                  + Nuevo establecimiento
-                </button>
-              </div>
-
-              {selectedEstablishments.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-border bg-white px-6 py-10 text-center">
-                  <p className="text-sm text-txt-muted">
-                    Esta empresa no tiene establecimientos registrados.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {selectedEstablishments.map((est) => (
-                    <EstablishmentCard
-                      key={est.id}
-                      establishment={est}
-                      onEdit={() => {
-                        setEditingEstablishment(est)
-                        setEstablishmentModalOpen(true)
-                      }}
-                      onDelete={() => {
-                        setDeletingItem({
-                          type: 'establishment',
-                          id: est.id,
-                          name: est.name,
-                        })
-                        setDeleteModalOpen(true)
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-          )}
-        </>
+                    {expandedEstablishments.length === 0 ? (
+                      <div className="rounded-md border border-dashed border-border px-4 py-6 text-center">
+                        <p className="text-xs text-txt-muted">
+                          Sin establecimientos registrados.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        {expandedEstablishments.map((est) => (
+                          <EstablishmentCard
+                            key={est.id}
+                            establishment={est}
+                            onEdit={() => {
+                              setEditingEstablishment(est)
+                              setEstablishmentModalOpen(true)
+                            }}
+                            onDelete={() => {
+                              setDeletingItem({
+                                type: 'establishment',
+                                id: est.id,
+                                name: est.name,
+                              })
+                              setDeleteModalOpen(true)
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </CompanyCard>
+            ))}
+          </div>
+        </section>
       )}
 
       <CompanyModal
@@ -385,7 +385,7 @@ export default function Organizations() {
         key={establishmentModalOpen ? (editingEstablishment?.id ?? 'new') : 'establishment-closed'}
         isOpen={establishmentModalOpen}
         establishment={editingEstablishment}
-        companyId={selectedCompanyId ?? 0}
+        companyId={expandedCompanyId ?? 0}
         onClose={() => setEstablishmentModalOpen(false)}
         onSubmit={handleEstablishmentSubmit}
       />

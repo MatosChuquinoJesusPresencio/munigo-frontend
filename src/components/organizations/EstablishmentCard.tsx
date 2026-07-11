@@ -25,32 +25,31 @@ export default function EstablishmentCard({
   onDelete,
 }: EstablishmentCardProps) {
   return (
-    <div className="rounded-lg border border-border bg-white p-5 shadow-sm">
-      <div className="mb-3">
-        <h4 className="text-base font-semibold text-txt">{establishment.name}</h4>
-        <p className="text-sm text-txt-muted">{establishment.address}</p>
+    <div className="flex items-center gap-3 rounded-md border border-border bg-surface/50 px-4 py-3">
+      <div className="min-w-0 flex-1">
+        <h4 className="truncate text-sm font-medium text-txt">{establishment.name}</h4>
+        <p className="truncate text-xs text-txt-muted">{establishment.address}</p>
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          <span
+            className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+              categoryColors[establishment.business_category] ?? 'bg-gray-100 text-gray-700'
+            }`}
+          >
+            {BusinessCategoryLabels[establishment.business_category]}
+          </span>
+          <span className="inline-block rounded-full bg-white px-2 py-0.5 text-xs font-medium text-txt-muted">
+            {EstablishmentSizeLabels[establishment.size]}
+          </span>
+          <span className="text-xs text-txt-muted">
+            {establishment.square_meters} m²
+          </span>
+        </div>
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <span
-          className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${
-            categoryColors[establishment.business_category] ?? 'bg-gray-100 text-gray-700'
-          }`}
-        >
-          {BusinessCategoryLabels[establishment.business_category]}
-        </span>
-        <span className="inline-block rounded-full bg-surface px-3 py-1 text-xs font-medium text-txt-muted">
-          {EstablishmentSizeLabels[establishment.size]}
-        </span>
-        <span className="text-xs text-txt-muted">
-          {establishment.square_meters} m²
-        </span>
-      </div>
-
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-1">
         <button
           onClick={onEdit}
-          className="rounded-md p-1.5 text-txt-muted transition hover:bg-surface hover:text-txt"
+          className="rounded-md p-1.5 text-txt-muted transition hover:bg-white hover:text-txt"
           aria-label="Editar establecimiento"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
