@@ -45,4 +45,8 @@ export const caseFileService = {
     formData.append('file', file)
     return apiUpload<void>('/procedures/attached-documents/', formData)
   },
+
+  async deleteDocument(docId: number): Promise<void> {
+    return apiRequest<void>(`/procedures/attached-documents/${docId}/`, { method: 'DELETE' })
+  },
 }
