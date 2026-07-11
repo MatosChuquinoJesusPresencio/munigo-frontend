@@ -24,12 +24,6 @@ export default function Login() {
       <h1 className="mb-1 text-2xl font-semibold text-txt">Iniciar sesión</h1>
       <p className="mb-6 text-sm text-txt-muted">Accede a tu cuenta de Munigo</p>
 
-      {error && (
-        <div className="mb-4 rounded-md border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">
-          {error}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <label htmlFor="documentType" className="text-sm font-medium text-txt">
@@ -84,6 +78,12 @@ export default function Login() {
         >
           {isLoading ? 'Ingresando...' : 'Iniciar sesión'}
         </button>
+
+        {error && (
+          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {error}
+          </div>
+        )}
       </form>
 
       <p className="mt-6 text-center text-sm text-txt-muted">
