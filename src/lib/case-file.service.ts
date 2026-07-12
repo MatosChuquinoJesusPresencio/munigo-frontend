@@ -49,4 +49,10 @@ export const caseFileService = {
   async deleteDocument(docId: number): Promise<void> {
     return apiRequest<void>(`/procedures/attached-documents/${docId}/`, { method: 'DELETE' })
   },
+
+  async submit(id: number): Promise<CaseFile> {
+    return apiRequest<CaseFile>(`/procedures/case-files/${id}/submit/`, {
+      method: 'POST',
+    })
+  },
 }

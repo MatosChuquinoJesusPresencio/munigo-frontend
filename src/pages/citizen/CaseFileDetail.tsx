@@ -23,10 +23,23 @@ export default function CaseFileDetail() {
   const [caseFile, setCaseFile] = useState<CaseFile | null>(null)
   const [requirements, setRequirements] = useState<ProcedureRequirement[]>([])
   const [loading, setLoading] = useState(true)
-  const [uploadingId, setUploadingId] = useState<number | null>(null)
+  const [uploadingIds, setUploadingIds] = useState<Set<number>>(new Set())
+  const [submitting, setSubmitting] = useState(false)
+  const [confirmSubmit, setConfirmSubmit] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+
+  function addUploading(id: number) {
+    setUploadingIds((prev) => new Set(prev).add(id))
+  }
+  function removeUploading(id: number) {
+    setUploadingIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+  }
 
   async function reload() {
     const cf = await caseFileService.getById(Number(id))
@@ -72,7 +85,7 @@ export default function CaseFileDetail() {
     const file = replaceFile ?? input?.files?.[0]
     if (!file) return
 
-    setUploadingId(prId)
+    addUploading(prId)
     setError(null)
 
     try {
@@ -82,12 +95,12 @@ export default function CaseFileDetail() {
     } catch (err) {
       setError(extractError(err))
     } finally {
-      setUploadingId(null)
+      removeUploading(prId)
     }
   }
 
   async function handleDelete(doc: AttachedDocument, prId: number) {
-    setUploadingId(prId)
+    addUploading(prId)
     setError(null)
     setConfirmDeleteId(null)
 
@@ -97,7 +110,7 @@ export default function CaseFileDetail() {
     } catch (err) {
       setError(extractError(err))
     } finally {
-      setUploadingId(null)
+      removeUploading(prId)
     }
   }
 
@@ -106,7 +119,7 @@ export default function CaseFileDetail() {
     if (!input?.files?.[0]) return
 
     const newFile = input.files[0]
-    setUploadingId(prId)
+    addUploading(prId)
     setError(null)
 
     try {
@@ -117,7 +130,22 @@ export default function CaseFileDetail() {
     } catch (err) {
       setError(extractError(err))
     } finally {
-      setUploadingId(null)
+      removeUploading(prId)
+    }
+  }
+
+  async function handleSubmit() {
+    setSubmitting(true)
+    setError(null)
+    setConfirmSubmit(false)
+
+    try {
+      await caseFileService.submit(Number(id))
+      await reload()
+    } catch (err) {
+      setError(extractError(err))
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -145,6 +173,8 @@ export default function CaseFileDetail() {
   }
 
   if (!caseFile) return null
+
+  const isDraft = caseFile.status === 'BORRADOR'
 
   const createdDate = new Date(caseFile.created_at).toLocaleDateString('es-PE', {
     day: '2-digit',
@@ -197,7 +227,7 @@ export default function CaseFileDetail() {
       <div className="space-y-4">
         {requirements.map((pr) => {
           const doc = pr.documents[0]
-          const isUploading = uploadingId === pr.id
+          const isUploading = uploadingIds.has(pr.id)
 
           return (
             <div key={pr.id} className="rounded-lg border border-border bg-white shadow-sm">
@@ -252,8 +282,8 @@ export default function CaseFileDetail() {
                       />
                       <button
                         onClick={() => fileInputRefs.current[`replace_${pr.id}`]?.click()}
-                        disabled={isUploading}
-                        className="flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-txt transition hover:bg-surface disabled:opacity-50"
+                        disabled={isUploading || !isDraft}
+                        className="flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-txt transition hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" />
@@ -281,8 +311,8 @@ export default function CaseFileDetail() {
                       ) : (
                         <button
                           onClick={() => setConfirmDeleteId(doc.id)}
-                          disabled={isUploading}
-                          className="flex items-center gap-1 rounded-md border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                          disabled={isUploading || !isDraft}
+                          className="flex items-center gap-1 rounded-md border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
@@ -303,8 +333,8 @@ export default function CaseFileDetail() {
                     />
                     <button
                       onClick={() => fileInputRefs.current[String(pr.id)]?.click()}
-                      disabled={isUploading}
-                      className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-txt transition hover:bg-surface disabled:opacity-50"
+                      disabled={isUploading || !isDraft}
+                      className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-txt transition hover:bg-surface disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isUploading ? (
                         'Subiendo...'
@@ -324,6 +354,48 @@ export default function CaseFileDetail() {
           )
         })}
       </div>
+
+      {!isDraft && (
+        <div className="mt-6 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+          Este trámite ya fue enviado y no se pueden modificar los documentos.
+        </div>
+      )}
+
+      {isDraft && (
+        <div className="mt-8 flex flex-col items-center gap-3">
+          {confirmSubmit ? (
+            <div className="rounded-lg border border-border bg-white p-4 shadow-sm text-center">
+              <p className="mb-3 text-sm text-txt">
+                ¿Estás seguro de enviar este trámite? Se verificará que todos los requisitos obligatorios estén cumplidos.
+              </p>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary/90 disabled:opacity-50"
+                >
+                  {submitting ? 'Enviando...' : 'Sí, enviar'}
+                </button>
+                <button
+                  onClick={() => setConfirmSubmit(false)}
+                  disabled={submitting}
+                  className="rounded-md border border-border px-4 py-2 text-sm font-medium text-txt transition hover:bg-surface disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirmSubmit(true)}
+              disabled={submitting}
+              className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-white transition hover:bg-primary/90 disabled:opacity-50"
+            >
+              Enviar Trámite
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

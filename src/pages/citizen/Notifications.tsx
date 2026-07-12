@@ -43,9 +43,7 @@ export default function Notifications() {
         <div>
           <h1 className="text-2xl font-bold text-txt">Mis Notificaciones</h1>
           <p className="text-sm text-txt-muted">
-            {unreadCount > 0
-              ? `Tienes ${unreadCount} notificación${unreadCount !== 1 ? 'es' : ''} sin leer`
-              : 'No tienes notificaciones sin leer'}
+            Revisa las actualizaciones de tus trámites
           </p>
         </div>
         {unreadCount > 0 && (
