@@ -1,5 +1,9 @@
-import { apiRequest, apiUpload } from './api'
+import { apiRequest } from './api'
+import { supabase } from './supabase'
 import type { CaseFile, CreateCaseFileRequest, UpdateCaseFileRequest, Requirement, ProcedureRequirement } from '../types/procedure'
+
+const ALLOWED_TYPES = ['application/pdf', 'image/png', 'image/jpeg']
+const MAX_SIZE = 20 * 1024 * 1024
 
 export const caseFileService = {
   async getAll(): Promise<CaseFile[]> {
@@ -39,11 +43,30 @@ export const caseFileService = {
   },
 
   async uploadDocument(procedureRequirementId: number, file: File, name: string): Promise<void> {
-    const formData = new FormData()
-    formData.append('procedure_requirement', String(procedureRequirementId))
-    formData.append('name', name)
-    formData.append('file', file)
-    return apiUpload<void>('/procedures/attached-documents/', formData)
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      throw new Error('Formato no permitido. Use PDF, PNG o JPEG.')
+    }
+    if (file.size > MAX_SIZE) {
+      throw new Error('El archivo excede el limite de 20 MB.')
+    }
+
+    const path = `documents/${procedureRequirementId}/${Date.now()}_${file.name}`
+    const { error: uploadError } = await supabase.storage
+      .from('documents')
+      .upload(path, file, { cacheControl: '3600', upsert: false })
+
+    if (uploadError) throw new Error(uploadError.message)
+
+    const { data: urlData } = supabase.storage.from('documents').getPublicUrl(path)
+
+    return apiRequest<void>('/procedures/attached-documents/', {
+      method: 'POST',
+      body: JSON.stringify({
+        procedure_requirement: procedureRequirementId,
+        name,
+        file: urlData.publicUrl,
+      }),
+    })
   },
 
   async deleteDocument(docId: number): Promise<void> {

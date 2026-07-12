@@ -4,11 +4,9 @@ export const API_BASE = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
   : '/api'
 
-export const MEDIA_BASE = import.meta.env.VITE_API_URL ?? ''
-
 export function getDocumentUrl(file: string): string {
   if (file.startsWith('http')) return file
-  return `${MEDIA_BASE}/${file}`
+  return `${API_BASE}/${file}`
 }
 
 function getAccessToken(): string | null {
@@ -104,45 +102,3 @@ export async function apiRequest<T>(
 }
 
 export { storeTokens, clearTokens, getAccessToken, getRefreshToken }
-
-export async function apiUpload<T>(
-  endpoint: string,
-  formData: FormData,
-): Promise<T> {
-  const url = `${API_BASE}${endpoint}`
-  const headers: Record<string, string> = {}
-
-  const token = getAccessToken()
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`
-  }
-
-  let response = await fetch(url, {
-    method: 'POST',
-    headers,
-    body: formData,
-  })
-
-  if (response.status === 401 && token) {
-    const newToken = await refreshAccessToken()
-    if (newToken) {
-      headers['Authorization'] = `Bearer ${newToken}`
-      response = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: formData,
-      })
-    }
-  }
-
-  if (!response.ok) {
-    const data = await response.json().catch(() => ({}))
-    throw new ApiClientError(response.status, data)
-  }
-
-  if (response.status === 204) {
-    return undefined as T
-  }
-
-  return response.json()
-}
