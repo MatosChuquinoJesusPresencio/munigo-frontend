@@ -21,7 +21,7 @@ export default function Header() {
                 to={user?.role === UserRole.EMPLOYEE ? '/panel' : '/appointments'}
                 className="text-sm font-semibold text-txt transition hover:text-primary"
               >
-                {user?.role === UserRole.EMPLOYEE ? 'Panel' : 'Mis Trámites'}
+                {user?.role === UserRole.EMPLOYEE ? 'Mi Panel' : 'Mis Trámites'}
               </Link>
               <button
                 onClick={() => logout()}

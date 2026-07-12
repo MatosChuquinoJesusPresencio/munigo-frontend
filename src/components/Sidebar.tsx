@@ -50,18 +50,18 @@ const citizenLinks: SidebarLink[] = [
 
 const employeeLinks: SidebarLink[] = [
   {
-    label: 'Panel',
+    label: 'Revisión de Trámites',
     to: '/panel',
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
       </svg>
     ),
   },
 ]
 
 export default function Sidebar() {
-  const { user, logout } = useAuth()
+  const { user, isLoading, logout } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -79,24 +79,35 @@ export default function Sidebar() {
 
   const sidebarLinks = (
     <nav className="flex flex-1 flex-col gap-1 p-4">
-      {links.map((link) => {
-        const isActive = location.pathname === link.to
-        return (
-          <Link
-            key={link.to}
-            to={link.to}
-            onClick={handleLinkClick}
-            className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition ${
-              isActive
-                ? 'border-l-3 border-primary bg-surface text-primary'
-                : 'text-txt-muted hover:bg-surface hover:text-txt'
-            }`}
-          >
-            {link.icon}
-            {link.label}
-          </Link>
-        )
-      })}
+      {isLoading ? (
+        <div className="space-y-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center gap-3 rounded-md px-3 py-2.5">
+              <div className="h-5 w-5 animate-pulse rounded bg-surface" />
+              <div className="h-4 animate-pulse rounded bg-surface" style={{ width: `${60 + i * 10}%` }} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        links.map((link) => {
+          const isActive = location.pathname === link.to
+          return (
+            <Link
+              key={link.to}
+              to={link.to}
+              onClick={handleLinkClick}
+              className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition ${
+                isActive
+                  ? 'border-l-3 border-primary bg-surface text-primary'
+                  : 'text-txt-muted hover:bg-surface hover:text-txt'
+              }`}
+            >
+              {link.icon}
+              {link.label}
+            </Link>
+          )
+        })
+      )}
     </nav>
   )
 

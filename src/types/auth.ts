@@ -14,6 +14,31 @@ export const UserRole = {
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
+export const Position = {
+  FUNCIONARIO: 'FUNCIONARIO',
+  INSPECTOR: 'INSPECTOR',
+  GERENTE: 'GERENTE',
+} as const
+
+export type Position = (typeof Position)[keyof typeof Position]
+
+export const PositionLabels: Record<Position, string> = {
+  [Position.FUNCIONARIO]: 'Funcionario',
+  [Position.INSPECTOR]: 'Inspector',
+  [Position.GERENTE]: 'Gerente',
+}
+
+export const Area = {
+  FISCALIZACION: 'FISCALIZACION',
+  TRIBUTACION: 'TRIBUTACION',
+  DESARROLLO_URBANO: 'DESARROLLO_URBANO',
+  LICENCIAS: 'LICENCIAS',
+  ADMINISTRACION: 'ADMINISTRACION',
+  OTRO: 'OTRO',
+} as const
+
+export type Area = (typeof Area)[keyof typeof Area]
+
 export interface RegisterRequest {
   first_name: string
   last_name: string
@@ -50,7 +75,8 @@ export interface Citizen {
 
 export interface Employee {
   id: number
-  position: string
+  position: Position
+  area: Area
 }
 
 export interface User {

@@ -11,6 +11,7 @@ import Appointments from './pages/citizen/Appointments'
 import Notifications from './pages/citizen/Notifications'
 import Organizations from './pages/citizen/Organizations'
 import Panel from './pages/employee/Panel'
+import CaseFileReview from './pages/employee/CaseFileReview'
 import NotFound from './pages/errors/NotFound'
 import Unauthorized from './pages/errors/Unauthorized'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -36,6 +37,7 @@ function App() {
 
         <Route element={<ProtectedRoute allowedRoles={[UserRole.EMPLOYEE]} />}>
           <Route path="/panel" element={<Panel />} />
+          <Route path="/panel/:id" element={<CaseFileReview />} />
         </Route>
       </Route>
 

@@ -1,25 +1,105 @@
-import { Link } from 'react-router'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router'
+import { employeeService } from '../../lib/employee.service'
+import type { CaseFile } from '../../types/procedure'
+import { CaseFileStatusLabels, CaseFileStatusColors, ProcedureTypeLabels, RiskLevelLabels, RiskLevelColors } from '../../types/procedure'
 
 export default function Panel() {
-  return (
-    <div className="mx-auto max-w-5xl px-4 py-12">
-      <h1 className="mb-2 text-2xl font-semibold text-txt">Panel</h1>
-      <p className="mb-8 text-txt-muted">Gestión de inspecciones y trámites</p>
+  const navigate = useNavigate()
+  const [caseFiles, setCaseFiles] = useState<CaseFile[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-      <div className="rounded-lg border border-border bg-white p-8 text-center shadow-sm">
-        <svg className="mx-auto mb-4 h-12 w-12 text-txt-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6Zm0 9.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6Zm0 9.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
-        </svg>
-        <p className="mb-4 text-sm text-txt-muted">
-          Próximamente podrás gestionar inspecciones y trámites aquí.
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      try {
+        setLoading(true)
+        const data = await employeeService.getPendingReview()
+        if (!cancelled) setCaseFiles(data)
+      } catch {
+        if (!cancelled) setError('Error al cargar los trámites pendientes.')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [])
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-txt">Panel de Revisión</h1>
+        <p className="text-sm text-txt-muted">
+          Trámites pendientes de revisión
         </p>
-        <Link
-          to="/"
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white transition hover:bg-primary-hover"
-        >
-          Volver al inicio
-        </Link>
       </div>
+
+      {error && (
+        <div className="mb-6 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">
+          {error}
+          <button onClick={() => setError(null)} className="ml-2 font-medium underline">
+            Cerrar
+          </button>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="rounded-lg border border-border bg-white p-8 text-center shadow-sm">
+          <p className="text-sm text-txt-muted">Cargando trámites...</p>
+        </div>
+      ) : caseFiles.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-border bg-white px-6 py-16 text-center">
+          <svg className="mx-auto mb-4 h-12 w-12 text-txt-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          <h3 className="mb-2 text-lg font-semibold text-txt">No hay trámites pendientes</h3>
+          <p className="text-sm text-txt-muted">
+            Cuando los ciudadanos envíen trámites, aparecerán aquí para su revisión.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {caseFiles.map((cf) => {
+            const createdDate = new Date(cf.created_at).toLocaleDateString('es-PE', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            })
+
+            return (
+              <div
+                key={cf.id}
+                className="cursor-pointer rounded-lg border border-border bg-white shadow-sm transition hover:border-primary/30 hover:shadow-md"
+                onClick={() => navigate(`/panel/${cf.id}`)}
+              >
+                <div className="px-5 py-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${CaseFileStatusColors[cf.status]}`}>
+                      {CaseFileStatusLabels[cf.status]}
+                    </span>
+                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${RiskLevelColors[cf.risk_level]}`}>
+                      Riesgo: {RiskLevelLabels[cf.risk_level]}
+                    </span>
+                  </div>
+
+                  <h3 className="text-base font-semibold text-txt">{cf.tracking_code}</h3>
+                  <p className="text-sm text-txt-muted">{ProcedureTypeLabels[cf.procedure_type]}</p>
+
+                  <div className="mt-2 flex items-center gap-4 text-xs text-txt-muted">
+                    <span>{cf.company_name}</span>
+                    <span>•</span>
+                    <span>{cf.establishment_name}</span>
+                    <span>•</span>
+                    <span>{createdDate}</span>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }
