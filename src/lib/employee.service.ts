@@ -20,6 +20,10 @@ export const employeeService = {
     return apiRequest<CaseFile[]>('/procedures/case-files/pending-review/')
   },
 
+  async getHistory(): Promise<CaseFile[]> {
+    return apiRequest<CaseFile[]>('/procedures/case-files/history/')
+  },
+
   async getCaseFileDetail(id: number): Promise<CaseFile> {
     return apiRequest<CaseFile>(`/procedures/case-files/${id}/`)
   },

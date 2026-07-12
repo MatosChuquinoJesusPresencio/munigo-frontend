@@ -125,7 +125,7 @@ export default function CaseFileReview() {
       <div className="mx-auto max-w-5xl px-4 py-8">
         <div className="rounded-lg border border-border bg-white p-8 text-center shadow-sm">
           <p className="text-sm text-red-600">{error}</p>
-          <button onClick={() => navigate('/panel')} className="mt-4 text-sm text-primary hover:underline">
+          <button onClick={() => navigate(-1)} className="mt-4 text-sm text-primary hover:underline">
             Volver al Panel
           </button>
         </div>
@@ -155,7 +155,7 @@ export default function CaseFileReview() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <button
-        onClick={() => navigate('/panel')}
+        onClick={() => navigate(-1)}
         className="mb-6 flex items-center gap-1 text-sm text-txt-muted transition hover:text-txt"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -311,6 +311,16 @@ export default function CaseFileReview() {
               Rechazar trámite
             </button>
           </div>
+        </div>
+      )}
+
+      {!canReview && caseFile.status !== CaseFileStatus.PENDIENTE_REVISION && (
+        <div className="mt-6 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+          {caseFile.status === CaseFileStatus.APROBADO
+            ? 'Este trámite fue aprobado.'
+            : caseFile.status === CaseFileStatus.RECHAZADO
+              ? 'Este trámite fue rechazado.'
+              : 'Este trámite ya fue revisado.'}
         </div>
       )}
 
