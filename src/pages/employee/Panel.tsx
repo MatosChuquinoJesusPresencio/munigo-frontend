@@ -95,6 +95,15 @@ export default function Panel() {
                     <span>{createdDate}</span>
                   </div>
                 </div>
+
+                <div className="border-t border-border px-5 py-3 bg-surface/30">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); navigate(`/panel/${cf.id}`) }}
+                    className="w-full rounded-md border border-primary bg-white px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/5"
+                  >
+                    Revisar trámite
+                  </button>
+                </div>
               </div>
             )
           })}
