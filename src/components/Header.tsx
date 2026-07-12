@@ -18,7 +18,7 @@ export default function Header() {
           {isAuthenticated ? (
             <>
               <Link
-                to={user?.role === UserRole.EMPLOYEE ? '/panel' : '/appointments'}
+                to={user?.role === UserRole.EMPLOYEE ? '/panel' : '/tramites'}
                 className="text-sm font-semibold text-txt transition hover:text-primary"
               >
                 {user?.role === UserRole.EMPLOYEE ? 'Mi Panel' : 'Mis Trámites'}
