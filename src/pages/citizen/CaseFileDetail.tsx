@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { caseFileService } from '../../lib/case-file.service'
-import { ApiClientError } from '../../lib/api'
+import { ApiClientError, getDocumentUrl } from '../../lib/api'
 import type { CaseFile, ProcedureRequirement, AttachedDocument } from '../../types/procedure'
 import { CaseFileStatusLabels, CaseFileStatusColors, ProcedureTypeLabels, RiskLevelLabels, RiskLevelColors } from '../../types/procedure'
 
@@ -263,7 +263,7 @@ export default function CaseFileDetail() {
 
                     <div className="mt-2 flex items-center gap-2">
                       <button
-                        onClick={() => window.open(doc.file, '_blank')}
+                        onClick={() => window.open(getDocumentUrl(doc.file), '_blank')}
                         disabled={isUploading}
                         className="flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-txt transition hover:bg-surface disabled:opacity-50"
                       >

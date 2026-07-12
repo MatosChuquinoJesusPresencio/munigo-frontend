@@ -7,13 +7,6 @@ export interface ValidateDocumentRequest {
   observations?: string
 }
 
-export interface AssignInspectorRequest {
-  inspector_id: number
-  scheduled_date: string
-  start_time: string
-  end_time: string
-}
-
 export interface EmployeeUser {
   id: number
   position: string
@@ -34,19 +27,6 @@ export const employeeService = {
   async validateDocument(docId: number, data: ValidateDocumentRequest): Promise<AttachedDocument> {
     return apiRequest<AttachedDocument>(`/procedures/attached-documents/${docId}/validate/`, {
       method: 'PATCH',
-      body: JSON.stringify(data),
-    })
-  },
-
-  async approveDocuments(caseFileId: number): Promise<CaseFile> {
-    return apiRequest<CaseFile>(`/procedures/case-files/${caseFileId}/approve-documents/`, {
-      method: 'POST',
-    })
-  },
-
-  async assignInspector(caseFileId: number, data: AssignInspectorRequest): Promise<CaseFile> {
-    return apiRequest<CaseFile>(`/procedures/case-files/${caseFileId}/assign-inspector/`, {
-      method: 'POST',
       body: JSON.stringify(data),
     })
   },

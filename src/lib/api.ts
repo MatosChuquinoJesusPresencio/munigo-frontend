@@ -1,8 +1,15 @@
 import type { AuthTokens } from '../types/auth'
 
-const API_BASE = import.meta.env.VITE_API_URL
+export const API_BASE = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL}/api`
   : '/api'
+
+export const MEDIA_BASE = import.meta.env.VITE_API_URL ?? ''
+
+export function getDocumentUrl(file: string): string {
+  if (file.startsWith('http')) return file
+  return `${MEDIA_BASE}/${file}`
+}
 
 function getAccessToken(): string | null {
   return localStorage.getItem('access_token')
