@@ -42,6 +42,24 @@ export const employeeService = {
     })
   },
 
+  async approveDocuments(caseFileId: number): Promise<CaseFile> {
+    return apiRequest<CaseFile>(`/procedures/case-files/${caseFileId}/approve-documents/`, {
+      method: 'POST',
+    })
+  },
+
+  async assignInspector(caseFileId: number, data: {
+    inspector_id: number
+    scheduled_date: string
+    start_time: string
+    end_time: string
+  }): Promise<CaseFile> {
+    return apiRequest<CaseFile>(`/procedures/case-files/${caseFileId}/assign-inspector/`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
   async getInspectors(): Promise<EmployeeUser[]> {
     return apiRequest<EmployeeUser[]>('/auth/employees/?position=INSPECTOR')
   },
