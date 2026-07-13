@@ -22,6 +22,8 @@ export interface Appointment {
   id: number
   case_file: number
   case_file_tracking?: string
+  case_file_procedure_type?: string
+  establishment_name?: string
   inspector_name?: string
   scheduled_date: string
   start_time: string
