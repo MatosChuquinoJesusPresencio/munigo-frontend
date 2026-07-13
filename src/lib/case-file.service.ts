@@ -1,4 +1,4 @@
-import { apiRequest } from './api'
+import { apiRequest, API_BASE, getAccessToken } from './api'
 import { supabase } from './supabase'
 import type { CaseFile, CreateCaseFileRequest, UpdateCaseFileRequest, Requirement, ProcedureRequirement } from '../types/procedure'
 
@@ -77,5 +77,29 @@ export const caseFileService = {
     return apiRequest<CaseFile>(`/procedures/case-files/${id}/submit/`, {
       method: 'POST',
     })
+  },
+
+  async downloadLicense(id: number, trackingCode: string): Promise<void> {
+    const url = `${API_BASE}/procedures/case-files/${id}/download-license/`
+    const token = getAccessToken()
+    const headers: Record<string, string> = {}
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const response = await fetch(url, { headers })
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      throw new Error(data.detail || 'Error al descargar la licencia.')
+    }
+
+    const blob = await response.blob()
+    const blobUrl = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = blobUrl
+    a.download = `licencia_${trackingCode}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(blobUrl)
+    a.remove()
   },
 }

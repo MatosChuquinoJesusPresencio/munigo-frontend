@@ -50,7 +50,7 @@ munigo-frontend/
 | Ruta | Página | Descripción |
 |------|--------|-------------|
 | `/tramites` | Tramites | Lista de expedientes del ciudadano |
-| `/tramites/:id` | CaseFileDetail | Detalle de expediente con requisitos y documentos |
+| `/tramites/:id` | CaseFileDetail | Detalle de expediente con requisitos, documentos y descarga de licencia |
 | `/appointments` | Appointments | Gestión de citas (confirmar, cancelar, reprogramar) |
 | `/notifications` | Notifications | Notificaciones del ciudadano |
 | `/organizations` | Organizations | Empresas y establecimientos |
@@ -79,7 +79,7 @@ munigo-frontend/
 |------|--------|-------------|
 | `/gerente/dashboard` | ManagerDashboard | Dashboard con estadísticas |
 | `/gerente/expedientes` | ManagerCaseFiles | Gestión de expedientes |
-| `/gerente/expedientes/:id` | ManagerCaseFileDetail | Detalle de expediente |
+| `/gerente/expedientes/:id` | ManagerCaseFileDetail | Detalle de expediente con descarga de licencia |
 | `/gerente/empleados` | ManagerEmployees | Gestión de empleados (CRUD) |
 | `/gerente/requisitos` | ManagerRequirements | Gestión de requisitos por tipo de trámite |
 
@@ -116,7 +116,7 @@ Todos los servicios usan el helper `apiRequest<T>()` que adjunta automáticament
 | Servicio | Funciones principales |
 |----------|----------------------|
 | `auth.service.ts` | `register`, `login`, `logout`, `getMe` |
-| `case-file.service.ts` | CRUD de expedientes, `submit`, `uploadDocument` (Supabase), `getRequirements` |
+| `case-file.service.ts` | CRUD de expedientes, `submit`, `uploadDocument` (Supabase), `getRequirements`, `downloadLicense` |
 | `company.service.ts` | CRUD de empresas, `searchCompanies`, `addCitizenToCompany` |
 | `establishment.service.ts` | CRUD de establecimientos |
 | `employee.service.ts` | CRUD de empleados, `getPendingReview`, `getDashboard`, `assignInspector`, `approveDocuments`, `setCaseFileStatus` |

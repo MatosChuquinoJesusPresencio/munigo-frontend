@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router'
 import { employeeService } from '../../lib/employee.service'
+import { caseFileService } from '../../lib/case-file.service'
 import { getDocumentUrl } from '../../lib/api'
 import type { CaseFile, ProcedureRequirement } from '../../types/procedure'
 import InfoSep from '../../components/InfoSep'
@@ -19,6 +20,7 @@ export default function ManagerCaseFileDetail() {
   const [requirements, setRequirements] = useState<ProcedureRequirement[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [downloading, setDownloading] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -40,6 +42,20 @@ export default function ManagerCaseFileDetail() {
     load()
     return () => { cancelled = true }
   }, [id])
+
+  async function handleDownloadLicense() {
+    if (!caseFile) return
+    setDownloading(true)
+    setError(null)
+    try {
+      await caseFileService.downloadLicense(caseFile.id, caseFile.tracking_code)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Error al descargar.'
+      setError(msg)
+    } finally {
+      setDownloading(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -116,6 +132,33 @@ export default function ManagerCaseFileDetail() {
           </div>
         )}
       </div>
+
+      {error && (
+        <div className="mb-6 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+          {error}
+        </div>
+      )}
+
+      {caseFile.status === 'APROBADO' && (
+        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 px-5 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-green-800">Expediente aprobado</p>
+              <p className="mt-0.5 text-xs text-green-600">Puedes descargar la licencia de funcionamiento en formato PDF.</p>
+            </div>
+            <button
+              onClick={handleDownloadLicense}
+              disabled={downloading}
+              className="flex items-center gap-2 rounded-md bg-green-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-800 disabled:opacity-50"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              {downloading ? 'Descargando...' : 'Descargar Licencia'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <h2 className="mb-4 text-lg font-semibold text-txt">Requisitos y Documentos</h2>
 
