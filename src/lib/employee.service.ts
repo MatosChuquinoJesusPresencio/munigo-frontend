@@ -13,6 +13,23 @@ export interface EmployeeUser {
   area: string
   first_name: string
   last_name: string
+  email?: string
+}
+
+export interface EmployeeCreateRequest {
+  first_name: string
+  last_name: string
+  email: string
+  password: string
+  document_type: string
+  document_number: string
+  position: string
+  area: string
+}
+
+export interface EmployeeUpdateRequest {
+  position: string
+  area: string
 }
 
 export const employeeService = {
@@ -62,5 +79,33 @@ export const employeeService = {
 
   async getInspectors(): Promise<EmployeeUser[]> {
     return apiRequest<EmployeeUser[]>('/auth/employees/?position=INSPECTOR')
+  },
+
+  async getAllEmployees(): Promise<EmployeeUser[]> {
+    return apiRequest<EmployeeUser[]>('/auth/employees/')
+  },
+
+  async createEmployee(data: EmployeeCreateRequest): Promise<EmployeeUser> {
+    return apiRequest<EmployeeUser>('/auth/employees/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async updateEmployee(id: number, data: EmployeeUpdateRequest): Promise<EmployeeUser> {
+    return apiRequest<EmployeeUser>(`/auth/employees/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async deleteEmployee(id: number): Promise<void> {
+    return apiRequest<void>(`/auth/employees/${id}/`, {
+      method: 'DELETE',
+    })
+  },
+
+  async getDashboard(): Promise<{ total: number; by_status: Record<string, number>; by_procedure_type: Record<string, number> }> {
+    return apiRequest('/procedures/case-files/dashboard/')
   },
 }

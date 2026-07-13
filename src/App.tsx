@@ -16,6 +16,11 @@ import Historial from './pages/employee/Historial'
 import InspectorPanel from './pages/employee/InspectorPanel'
 import InspectionHistory from './pages/employee/InspectionHistory'
 import InspectionDetail from './pages/employee/InspectionDetail'
+import ManagerDashboard from './pages/manager/ManagerDashboard'
+import ManagerCaseFiles from './pages/manager/ManagerCaseFiles'
+import ManagerCaseFileDetail from './pages/manager/ManagerCaseFileDetail'
+import ManagerEmployees from './pages/manager/ManagerEmployees'
+import ManagerRequirements from './pages/manager/ManagerRequirements'
 import NotFound from './pages/errors/NotFound'
 import Unauthorized from './pages/errors/Unauthorized'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -46,6 +51,11 @@ function App() {
           <Route path="/inspector" element={<InspectorPanel />} />
           <Route path="/historial-inspecciones" element={<InspectionHistory />} />
           <Route path="/inspector/:id" element={<InspectionDetail />} />
+          <Route path="/gerente" element={<ManagerDashboard />} />
+          <Route path="/gerente/expedientes" element={<ManagerCaseFiles />} />
+          <Route path="/gerente/expedientes/:id" element={<ManagerCaseFileDetail />} />
+          <Route path="/gerente/empleados" element={<ManagerEmployees />} />
+          <Route path="/gerente/requisitos" element={<ManagerRequirements />} />
         </Route>
       </Route>
 

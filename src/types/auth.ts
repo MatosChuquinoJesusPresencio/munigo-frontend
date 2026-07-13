@@ -39,6 +39,15 @@ export const Area = {
 
 export type Area = (typeof Area)[keyof typeof Area]
 
+export const AreaLabels: Record<Area, string> = {
+  [Area.FISCALIZACION]: 'Fiscalización',
+  [Area.TRIBUTACION]: 'Tributación',
+  [Area.DESARROLLO_URBANO]: 'Desarrollo Urbano',
+  [Area.LICENCIAS]: 'Licencias',
+  [Area.ADMINISTRACION]: 'Administración',
+  [Area.OTRO]: 'Otro',
+}
+
 export interface RegisterRequest {
   first_name: string
   last_name: string
