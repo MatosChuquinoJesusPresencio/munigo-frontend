@@ -16,6 +16,7 @@ import Historial from './pages/employee/Historial'
 import InspectorPanel from './pages/employee/InspectorPanel'
 import InspectionHistory from './pages/employee/InspectionHistory'
 import InspectionDetail from './pages/employee/InspectionDetail'
+import AppointmentCalendar from './pages/employee/AppointmentCalendar'
 import ManagerDashboard from './pages/manager/ManagerDashboard'
 import ManagerCaseFiles from './pages/manager/ManagerCaseFiles'
 import ManagerCaseFileDetail from './pages/manager/ManagerCaseFileDetail'
@@ -51,6 +52,7 @@ function App() {
           <Route path="/inspector" element={<InspectorPanel />} />
           <Route path="/historial-inspecciones" element={<InspectionHistory />} />
           <Route path="/inspector/:id" element={<InspectionDetail />} />
+          <Route path="/calendario" element={<AppointmentCalendar />} />
         </Route>
 
         <Route element={<ProtectedRoute allowedRoles={[UserRole.EMPLOYEE]} allowedPositions={[Position.GERENTE]} />}>

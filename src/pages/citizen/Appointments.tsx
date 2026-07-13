@@ -3,11 +3,24 @@ import { appointmentService } from '../../lib/appointment.service'
 import type { Appointment } from '../../types/appointment'
 import { AppointmentStatus } from '../../types/appointment'
 import AppointmentCard from '../../components/appointments/AppointmentCard'
+import CancelAppointmentModal from '../../components/appointments/CancelAppointmentModal'
+import RescheduleModal from '../../components/appointments/RescheduleModal'
+
+const ACTIVE_STATUSES: AppointmentStatus[] = [
+  AppointmentStatus.PENDIENTE_CONFIRMACION,
+  AppointmentStatus.PROGRAMADA,
+  AppointmentStatus.CONFIRMADA,
+  AppointmentStatus.PENDIENTE_REPROGRAMACION,
+]
 
 export default function Appointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [actionLoading, setActionLoading] = useState(false)
+
+  const [cancelTarget, setCancelTarget] = useState<Appointment | null>(null)
+  const [rescheduleTarget, setRescheduleTarget] = useState<Appointment | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -27,20 +40,49 @@ export default function Appointments() {
     return () => { cancelled = true }
   }, [])
 
+  async function reload() {
+    const data = await appointmentService.getAll()
+    setAppointments(data)
+  }
+
+  async function handleConfirm(id: number) {
+    setActionLoading(true)
+    try {
+      await appointmentService.confirm(id)
+      await reload()
+    } catch {
+      // error handled in card
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  async function handleCancelConfirm(reason: string) {
+    if (!cancelTarget) return
+    await appointmentService.cancel(cancelTarget.id, reason)
+    setCancelTarget(null)
+    await reload()
+  }
+
+  async function handleRescheduleConfirm() {
+    setRescheduleTarget(null)
+    await reload()
+  }
+
   const now = new Date()
   const upcoming = appointments
-    .filter((a) => a.status === AppointmentStatus.PROGRAMADA && new Date(a.scheduled_date) >= now)
+    .filter((a) => ACTIVE_STATUSES.includes(a.status) && new Date(a.scheduled_date) >= now)
     .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
 
   const past = appointments
-    .filter((a) => a.status !== AppointmentStatus.PROGRAMADA || new Date(a.scheduled_date) < now)
+    .filter((a) => !ACTIVE_STATUSES.includes(a.status) || new Date(a.scheduled_date) < now)
     .sort((a, b) => new Date(b.scheduled_date).getTime() - new Date(a.scheduled_date).getTime())
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-txt">Mis Citas</h1>
-        <p className="text-sm text-txt-muted">Citas programadas para inspecciones</p>
+        <p className="text-sm text-txt-muted">Gestiona tus citas de inspección</p>
       </div>
 
       {loading ? (
@@ -70,7 +112,14 @@ export default function Appointments() {
               <h2 className="mb-4 text-sm font-semibold text-txt-muted">Próximas</h2>
               <div className="space-y-3">
                 {upcoming.map((a) => (
-                  <AppointmentCard key={a.id} appointment={a} />
+                  <AppointmentCard
+                    key={a.id}
+                    appointment={a}
+                    loading={actionLoading}
+                    onConfirm={handleConfirm}
+                    onCancel={(id) => setCancelTarget(appointments.find((x) => x.id === id) ?? null)}
+                    onReschedule={(id) => setRescheduleTarget(appointments.find((x) => x.id === id) ?? null)}
+                  />
                 ))}
               </div>
             </section>
@@ -88,6 +137,21 @@ export default function Appointments() {
           )}
         </div>
       )}
+
+      <CancelAppointmentModal
+        isOpen={!!cancelTarget}
+        trackingCode={cancelTarget?.case_file_tracking ?? ''}
+        onConfirm={handleCancelConfirm}
+        onClose={() => setCancelTarget(null)}
+      />
+
+      <RescheduleModal
+        isOpen={!!rescheduleTarget}
+        appointmentId={rescheduleTarget?.id ?? 0}
+        trackingCode={rescheduleTarget?.case_file_tracking ?? ''}
+        onConfirm={handleRescheduleConfirm}
+        onClose={() => setRescheduleTarget(null)}
+      />
     </div>
   )
 }
