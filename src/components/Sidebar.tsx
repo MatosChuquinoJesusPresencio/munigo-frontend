@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { useAuth } from '../contexts/AuthContext'
-import { UserRole } from '../types/auth'
+import { UserRole, Position } from '../types/auth'
 
 interface SidebarLink {
   label: string
@@ -60,7 +60,28 @@ const employeeLinks: SidebarLink[] = [
   },
   {
     label: 'Historial de Trámites',
-    to: '/historial',
+    to: '/historial-tramites',
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+      </svg>
+    ),
+  },
+]
+
+const inspectorLinks: SidebarLink[] = [
+  {
+    label: 'Mis Inspecciones',
+    to: '/inspector',
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Historial de Inspecciones',
+    to: '/historial-inspecciones',
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -75,7 +96,11 @@ export default function Sidebar() {
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  const links = user?.role === UserRole.EMPLOYEE ? employeeLinks : citizenLinks
+  const links = user?.role === UserRole.EMPLOYEE
+    ? user.employee?.position === Position.INSPECTOR
+      ? inspectorLinks
+      : employeeLinks
+    : citizenLinks
 
   function handleLinkClick() {
     setMobileOpen(false)
@@ -99,7 +124,7 @@ export default function Sidebar() {
         </div>
       ) : (
         links.map((link) => {
-          const isActive = location.pathname === link.to
+          const isActive = location.pathname === link.to || location.pathname.startsWith(link.to + '/')
           return (
             <Link
               key={link.to}

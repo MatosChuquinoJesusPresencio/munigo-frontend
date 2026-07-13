@@ -74,6 +74,9 @@ export interface CaseFile {
   risk_level: RiskLevel
   status: CaseFileStatus
   procedure_requirements?: ProcedureRequirement[]
+  inspection_date?: string
+  inspection_start_time?: string
+  inspection_end_time?: string
 }
 
 export interface Requirement {

@@ -13,6 +13,9 @@ import Organizations from './pages/citizen/Organizations'
 import Panel from './pages/employee/Panel'
 import CaseFileReview from './pages/employee/CaseFileReview'
 import Historial from './pages/employee/Historial'
+import InspectorPanel from './pages/employee/InspectorPanel'
+import InspectionHistory from './pages/employee/InspectionHistory'
+import InspectionDetail from './pages/employee/InspectionDetail'
 import NotFound from './pages/errors/NotFound'
 import Unauthorized from './pages/errors/Unauthorized'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -39,7 +42,10 @@ function App() {
         <Route element={<ProtectedRoute allowedRoles={[UserRole.EMPLOYEE]} />}>
           <Route path="/panel" element={<Panel />} />
           <Route path="/panel/:id" element={<CaseFileReview />} />
-          <Route path="/historial" element={<Historial />} />
+          <Route path="/historial-tramites" element={<Historial />} />
+          <Route path="/inspector" element={<InspectorPanel />} />
+          <Route path="/historial-inspecciones" element={<InspectionHistory />} />
+          <Route path="/inspector/:id" element={<InspectionDetail />} />
         </Route>
       </Route>
 
