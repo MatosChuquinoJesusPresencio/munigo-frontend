@@ -51,7 +51,7 @@ function App() {
           <Route path="/inspector" element={<InspectorPanel />} />
           <Route path="/historial-inspecciones" element={<InspectionHistory />} />
           <Route path="/inspector/:id" element={<InspectionDetail />} />
-          <Route path="/gerente" element={<ManagerDashboard />} />
+          <Route path="/gerente/dashboard" element={<ManagerDashboard />} />
           <Route path="/gerente/expedientes" element={<ManagerCaseFiles />} />
           <Route path="/gerente/expedientes/:id" element={<ManagerCaseFileDetail />} />
           <Route path="/gerente/empleados" element={<ManagerEmployees />} />
