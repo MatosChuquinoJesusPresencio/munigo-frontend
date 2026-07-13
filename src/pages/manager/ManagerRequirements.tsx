@@ -16,19 +16,25 @@ export default function ManagerRequirements() {
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
   async function loadRequirements() {
-    try {
-      setLoading(true)
-      const data = await requirementService.getAll(activeTab)
-      setRequirements(data)
-    } catch {
-      // silent
-    } finally {
-      setLoading(false)
-    }
+    const data = await requirementService.getAll(activeTab)
+    setRequirements(data)
   }
 
   useEffect(() => {
-    loadRequirements()
+    let cancelled = false
+    async function load() {
+      try {
+        setLoading(true)
+        const data = await requirementService.getAll(activeTab)
+        if (!cancelled) setRequirements(data)
+      } catch {
+        // silent
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
   }, [activeTab])
 
   async function handleCreate(data: RequirementCreateRequest | RequirementUpdateRequest) {

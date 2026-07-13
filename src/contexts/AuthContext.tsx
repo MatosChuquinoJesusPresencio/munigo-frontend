@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useCallback, useEffect } from 'rea
 import type { ReactNode } from 'react'
 import type { LoginRequest, RegisterRequest, User } from '../types/auth'
 import * as authService from '../lib/auth.service'
-import { getAccessToken, ApiClientError } from '../lib/api'
+import { getAccessToken, clearTokens, ApiClientError } from '../lib/api'
 
 interface AuthContextValue {
   user: User | null
@@ -47,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         if (!cancelled) {
+          clearTokens()
           setIsAuthenticated(false)
           setUser(null)
         }
@@ -66,6 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(me)
       setIsAuthenticated(true)
     } catch (err) {
+      clearTokens()
       const message = extractErrorMessage(err)
       setError(message)
       throw err

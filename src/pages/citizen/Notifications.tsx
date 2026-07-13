@@ -7,14 +7,18 @@ import NotificationEmptyState from '../../components/notifications/NotificationE
 export default function Notifications() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
         setLoading(true)
+        setError(null)
         const data = await notificationService.getAll()
         if (!cancelled) setNotifications(data)
+      } catch {
+        if (!cancelled) setError('Error al cargar las notificaciones.')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -59,6 +63,10 @@ export default function Notifications() {
       {loading ? (
         <div className="rounded-lg border border-border bg-white p-8 text-center shadow-sm">
           <p className="text-sm text-txt-muted">Cargando notificaciones...</p>
+        </div>
+      ) : error ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       ) : notifications.length === 0 ? (
         <NotificationEmptyState />

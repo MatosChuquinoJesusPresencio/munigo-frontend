@@ -36,7 +36,6 @@ export default function Login() {
             className="rounded-md border border-border bg-white px-3 py-2 text-sm text-txt outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
           >
             <option value={DocumentType.DNI}>DNI</option>
-            <option value={DocumentType.RUC}>RUC</option>
             <option value={DocumentType.CARNE_DE_EXTRANJERIA}>Carné de Extranjería</option>
             <option value={DocumentType.PASAPORTE}>Pasaporte</option>
           </select>

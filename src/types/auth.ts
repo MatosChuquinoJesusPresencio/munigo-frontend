@@ -1,6 +1,5 @@
 export const DocumentType = {
   DNI: 'DNI',
-  RUC: 'RUC',
   CARNE_DE_EXTRANJERIA: 'CARNE_DE_EXTRANJERIA',
   PASAPORTE: 'PASAPORTE',
 } as const

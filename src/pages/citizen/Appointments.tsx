@@ -7,14 +7,18 @@ import AppointmentCard from '../../components/appointments/AppointmentCard'
 export default function Appointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
         setLoading(true)
+        setError(null)
         const data = await appointmentService.getAll()
         if (!cancelled) setAppointments(data)
+      } catch {
+        if (!cancelled) setError('Error al cargar las citas.')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -42,6 +46,10 @@ export default function Appointments() {
       {loading ? (
         <div className="rounded-lg border border-border bg-white p-8 text-center shadow-sm">
           <p className="text-sm text-txt-muted">Cargando citas...</p>
+        </div>
+      ) : error ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       ) : appointments.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border bg-white px-6 py-16 text-center">

@@ -22,6 +22,7 @@ export default function Tramites() {
   const [caseFiles, setCaseFiles] = useState<CaseFile[]>([])
   const [companies, setCompanies] = useState<Company[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [deletingCaseFile, setDeletingCaseFile] = useState<CaseFile | null>(null)
@@ -31,6 +32,7 @@ export default function Tramites() {
     async function load() {
       try {
         setLoading(true)
+        setError(null)
         const [cf, co] = await Promise.all([
           caseFileService.getAll(),
           getCompanies(),
@@ -39,6 +41,8 @@ export default function Tramites() {
           setCaseFiles(cf)
           setCompanies(co)
         }
+      } catch {
+        if (!cancelled) setError('Error al cargar los trámites.')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -87,6 +91,10 @@ export default function Tramites() {
       {loading ? (
         <div className="rounded-lg border border-border bg-white p-8 text-center shadow-sm">
           <p className="text-sm text-txt-muted">Cargando trámites...</p>
+        </div>
+      ) : error ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center shadow-sm">
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       ) : caseFiles.length === 0 ? (
         <CaseFileEmptyState onCreate={() => setModalOpen(true)} />

@@ -12,19 +12,25 @@ export default function ManagerEmployees() {
   const [deletingId, setDeletingId] = useState<number | null>(null)
 
   async function loadEmployees() {
-    try {
-      setLoading(true)
-      const data = await employeeService.getAllEmployees()
-      setEmployees(data)
-    } catch {
-      // silent
-    } finally {
-      setLoading(false)
-    }
+    const data = await employeeService.getAllEmployees()
+    setEmployees(data)
   }
 
   useEffect(() => {
-    loadEmployees()
+    let cancelled = false
+    async function load() {
+      try {
+        setLoading(true)
+        const data = await employeeService.getAllEmployees()
+        if (!cancelled) setEmployees(data)
+      } catch {
+        // silent
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
   }, [])
 
   async function handleCreate(data: EmployeeCreateRequest | EmployeeUpdateRequest) {
