@@ -1,12 +1,13 @@
 import { Navigate, Outlet } from 'react-router'
 import { useAuth } from '../contexts/AuthContext'
-import type { UserRole } from '../types/auth'
+import type { UserRole, Position } from '../types/auth'
 
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[]
+  allowedPositions?: Position[]
 }
 
-export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
+export default function ProtectedRoute({ allowedRoles, allowedPositions }: ProtectedRouteProps) {
   const { user, isAuthenticated, isLoading } = useAuth()
 
   if (isLoading) {
@@ -22,6 +23,10 @@ export default function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/unauthorized" replace />
+  }
+
+  if (allowedPositions && (!user.employee || !allowedPositions.includes(user.employee.position))) {
     return <Navigate to="/unauthorized" replace />
   }
 

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { EmployeeUser, EmployeeCreateRequest, EmployeeUpdateRequest } from '../../lib/employee.service'
-import { PositionLabels, Position, Area, AreaLabels } from '../../types/auth'
-import { DocumentType } from '../../types/auth'
+import { PositionLabels, Position, Area, AreaLabels, DocumentType } from '../../types/auth'
 
 interface EmployeeFormProps {
   employee?: EmployeeUser | null
@@ -20,7 +19,7 @@ export default function EmployeeForm({ employee, onSave, onCancel }: EmployeeFor
   const [lastName, setLastName] = useState(employee?.last_name || '')
   const [email, setEmail] = useState(employee?.email || '')
   const [password, setPassword] = useState('')
-  const [documentType, setDocumentType] = useState('DNI')
+  const [documentType, setDocumentType] = useState<string>(DocumentType.DNI)
   const [documentNumber, setDocumentNumber] = useState('')
   const [position, setPosition] = useState(employee?.position || 'FUNCIONARIO')
   const [area, setArea] = useState(employee?.area || 'OTRO')

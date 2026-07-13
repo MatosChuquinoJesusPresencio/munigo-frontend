@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router'
 import { employeeService } from '../../lib/employee.service'
 import { getDocumentUrl } from '../../lib/api'
 import type { CaseFile, ProcedureRequirement } from '../../types/procedure'
+import InfoSep from '../../components/InfoSep'
 import { CaseFileStatusLabels, CaseFileStatusColors, ProcedureTypeLabels, RiskLevelLabels, RiskLevelColors } from '../../types/procedure'
 
 const ValidationStatusConfig: Record<string, { bg: string; border: string; text: string; label: string }> = {
@@ -17,19 +18,21 @@ export default function ManagerCaseFileDetail() {
   const [caseFile, setCaseFile] = useState<CaseFile | null>(null)
   const [requirements, setRequirements] = useState<ProcedureRequirement[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
         setLoading(true)
+        setError(null)
         const cf = await employeeService.getCaseFileDetail(Number(id))
         if (!cancelled) {
           setCaseFile(cf)
           setRequirements(cf.procedure_requirements || [])
         }
       } catch {
-        // silent
+        if (!cancelled) setError('Error al cargar el expediente.')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -52,7 +55,7 @@ export default function ManagerCaseFileDetail() {
     return (
       <div className="mx-auto max-w-5xl px-4 py-8">
         <div className="rounded-lg border border-border bg-white p-8 text-center shadow-sm">
-          <p className="text-sm text-red-600">Expediente no encontrado.</p>
+          <p className="text-sm text-red-600">{error || 'Expediente no encontrado.'}</p>
           <button onClick={() => navigate(-1)} className="mt-4 text-sm text-primary hover:underline">Volver</button>
         </div>
       </div>
@@ -90,12 +93,8 @@ export default function ManagerCaseFileDetail() {
         <h1 className="mb-1 text-2xl font-bold text-txt">{caseFile.tracking_code}</h1>
         <p className="text-sm text-txt-muted">{ProcedureTypeLabels[caseFile.procedure_type]}</p>
 
-        <div className="mt-4 flex items-center gap-4 text-sm text-txt-muted">
-          <span>{caseFile.company_name}</span>
-          <span>•</span>
-          <span>{caseFile.establishment_name}</span>
-          <span>•</span>
-          <span>Creado el {createdDate}</span>
+        <div className="mt-4 text-sm text-txt-muted">
+          <InfoSep items={[caseFile.company_name, caseFile.establishment_name, `Creado el ${createdDate}`]} />
         </div>
 
         {caseFile.inspection_date && (

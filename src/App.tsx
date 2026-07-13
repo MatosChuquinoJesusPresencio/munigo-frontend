@@ -25,7 +25,7 @@ import NotFound from './pages/errors/NotFound'
 import Unauthorized from './pages/errors/Unauthorized'
 import ProtectedRoute from './components/ProtectedRoute'
 import GuestRoute from './components/GuestRoute'
-import { UserRole } from './types/auth'
+import { UserRole, Position } from './types/auth'
 
 function App() {
   return (
@@ -51,6 +51,9 @@ function App() {
           <Route path="/inspector" element={<InspectorPanel />} />
           <Route path="/historial-inspecciones" element={<InspectionHistory />} />
           <Route path="/inspector/:id" element={<InspectionDetail />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={[UserRole.EMPLOYEE]} allowedPositions={[Position.GERENTE]} />}>
           <Route path="/gerente/dashboard" element={<ManagerDashboard />} />
           <Route path="/gerente/expedientes" element={<ManagerCaseFiles />} />
           <Route path="/gerente/expedientes/:id" element={<ManagerCaseFileDetail />} />

@@ -5,6 +5,7 @@ import { ApiClientError, getDocumentUrl } from '../../lib/api'
 import type { CaseFile, ProcedureRequirement } from '../../types/procedure'
 import { CaseFileStatus, CaseFileStatusLabels, CaseFileStatusColors, ProcedureTypeLabels, RiskLevelLabels, RiskLevelColors } from '../../types/procedure'
 import type { EmployeeUser } from '../../lib/employee.service'
+import InfoSep from '../../components/InfoSep'
 
 const ValidationStatusConfig: Record<string, { bg: string; border: string; text: string; icon: string; label: string }> = {
   PENDIENTE: {
@@ -240,6 +241,10 @@ export default function CaseFileReview() {
       setError('Completa todos los campos para asignar el inspector.')
       return
     }
+    if (endTime <= startTime) {
+      setError('La hora de fin debe ser posterior a la hora de inicio.')
+      return
+    }
     setProcessing(true)
     setError(null)
     try {
@@ -289,7 +294,7 @@ export default function CaseFileReview() {
   })
 
   const requiredReqs = requirements.filter((pr) => pr.requirement.is_required)
-  const allRequiredApproved = requiredReqs.length > 0 && requiredReqs.every((pr) =>
+  const allRequiredApproved = requiredReqs.length === 0 || requiredReqs.every((pr) =>
     pr.documents.some((doc) => doc.validation_status === 'APROBADO')
   )
   const allDocsReviewed = requirements.every((pr) =>
@@ -328,12 +333,8 @@ export default function CaseFileReview() {
         <h1 className="mb-1 text-2xl font-bold text-txt">{caseFile.tracking_code}</h1>
         <p className="text-sm text-txt-muted">{ProcedureTypeLabels[caseFile.procedure_type]}</p>
 
-        <div className="mt-4 flex items-center gap-4 text-sm text-txt-muted">
-          <span>{caseFile.company_name}</span>
-          <span>•</span>
-          <span>{caseFile.establishment_name}</span>
-          <span>•</span>
-          <span>Creado el {createdDate}</span>
+        <div className="mt-4 text-sm text-txt-muted">
+          <InfoSep items={[caseFile.company_name, caseFile.establishment_name, `Creado el ${createdDate}`]} />
         </div>
       </div>
 

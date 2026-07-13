@@ -30,14 +30,14 @@ export default function ManagerEmployees() {
   async function handleCreate(data: EmployeeCreateRequest | EmployeeUpdateRequest) {
     await employeeService.createEmployee(data as EmployeeCreateRequest)
     setShowForm(false)
-    await loadEmployees()
+    try { await loadEmployees() } catch { /* form already closed */ }
   }
 
   async function handleUpdate(data: EmployeeUpdateRequest) {
     if (!editingEmployee) return
     await employeeService.updateEmployee(editingEmployee.id, data)
     setEditingEmployee(null)
-    await loadEmployees()
+    try { await loadEmployees() } catch { /* form already closed */ }
   }
 
   async function handleDelete(id: number) {

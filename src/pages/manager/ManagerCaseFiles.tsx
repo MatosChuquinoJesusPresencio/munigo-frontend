@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router'
 import { apiRequest } from '../../lib/api'
 import type { CaseFile } from '../../types/procedure'
 import { CaseFileStatusLabels, CaseFileStatusColors, ProcedureTypeLabels, RiskLevelLabels, RiskLevelColors } from '../../types/procedure'
+import InfoSep from '../../components/InfoSep'
 
 export default function ManagerCaseFiles() {
   const navigate = useNavigate()
   const [caseFiles, setCaseFiles] = useState<CaseFile[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filterStatus, setFilterStatus] = useState<string>('')
   const [filterType, setFilterType] = useState<string>('')
 
@@ -16,10 +18,11 @@ export default function ManagerCaseFiles() {
     async function load() {
       try {
         setLoading(true)
+        setError(null)
         const data = await apiRequest<CaseFile[]>('/procedures/case-files/')
         if (!cancelled) setCaseFiles(data)
       } catch {
-        // silent
+        if (!cancelled) setError('Error al cargar los expedientes.')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -64,6 +67,10 @@ export default function ManagerCaseFiles() {
         </select>
       </div>
 
+      {error && (
+        <div className="mb-6 rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
+      )}
+
       {loading ? (
         <div className="rounded-lg border border-border bg-white p-8 text-center shadow-sm">
           <p className="text-sm text-txt-muted">Cargando expedientes...</p>
@@ -101,13 +108,7 @@ export default function ManagerCaseFiles() {
                   <h3 className="text-base font-semibold text-txt">{cf.tracking_code}</h3>
                   <p className="text-sm text-txt-muted">{ProcedureTypeLabels[cf.procedure_type]}</p>
 
-                  <div className="mt-2 flex items-center gap-4 text-xs text-txt-muted">
-                    <span>{cf.company_name}</span>
-                    <span>•</span>
-                    <span>{cf.establishment_name}</span>
-                    <span>•</span>
-                    <span>{createdDate}</span>
-                  </div>
+                  <InfoSep items={[cf.company_name, cf.establishment_name, createdDate]} />
                 </div>
               </div>
             )

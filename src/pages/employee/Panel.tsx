@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { employeeService } from '../../lib/employee.service'
 import type { CaseFile } from '../../types/procedure'
 import { CaseFileStatusLabels, CaseFileStatusColors, ProcedureTypeLabels, RiskLevelLabels, RiskLevelColors } from '../../types/procedure'
+import InfoSep from '../../components/InfoSep'
 
 export default function Panel() {
   const navigate = useNavigate()
@@ -87,13 +88,7 @@ export default function Panel() {
                   <h3 className="text-base font-semibold text-txt">{cf.tracking_code}</h3>
                   <p className="text-sm text-txt-muted">{ProcedureTypeLabels[cf.procedure_type]}</p>
 
-                  <div className="mt-2 flex items-center gap-4 text-xs text-txt-muted">
-                    <span>{cf.company_name}</span>
-                    <span>•</span>
-                    <span>{cf.establishment_name}</span>
-                    <span>•</span>
-                    <span>{createdDate}</span>
-                  </div>
+                  <InfoSep items={[cf.company_name, cf.establishment_name, createdDate]} />
                 </div>
 
                 <div className="border-t border-border px-5 py-3 bg-surface/30">

@@ -34,14 +34,14 @@ export default function ManagerRequirements() {
   async function handleCreate(data: RequirementCreateRequest | RequirementUpdateRequest) {
     await requirementService.create(data as RequirementCreateRequest)
     setShowForm(false)
-    await loadRequirements()
+    try { await loadRequirements() } catch { /* form already closed */ }
   }
 
   async function handleUpdate(data: RequirementUpdateRequest) {
     if (!editingRequirement) return
     await requirementService.update(editingRequirement.id, data)
     setEditingRequirement(null)
-    await loadRequirements()
+    try { await loadRequirements() } catch { /* form already closed */ }
   }
 
   async function confirmDelete() {
