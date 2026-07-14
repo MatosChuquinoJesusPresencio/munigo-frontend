@@ -255,6 +255,10 @@ export default function CaseFileReview() {
         end_time: endTime,
       })
       await reload()
+      setInspectorId(0)
+      setScheduledDate('')
+      setStartTime('')
+      setEndTime('')
     } catch (err) {
       setError(extractError(err))
     } finally {
