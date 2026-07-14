@@ -22,6 +22,7 @@ export default function RescheduleModal({
   const [reason, setReason] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const d = new Date()
 
   if (!isOpen) return null
 
@@ -66,7 +67,7 @@ export default function RescheduleModal({
             <input
               type="date"
               value={newDate}
-              min={new Date().toISOString().split('T')[0]}
+              min={`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`}
               onChange={(e) => setNewDate(e.target.value)}
               className="w-full rounded-md border border-border px-3 py-2 text-sm text-txt outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
             />
