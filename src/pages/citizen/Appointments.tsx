@@ -70,13 +70,15 @@ export default function Appointments() {
   }
 
   const now = new Date()
+  const nowStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+
   const upcoming = appointments
-    .filter((a) => ACTIVE_STATUSES.includes(a.status) && new Date(a.scheduled_date) >= now)
-    .sort((a, b) => new Date(a.scheduled_date).getTime() - new Date(b.scheduled_date).getTime())
+    .filter((a) => ACTIVE_STATUSES.includes(a.status) && a.scheduled_date >= nowStr)
+    .sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date))
 
   const past = appointments
-    .filter((a) => !ACTIVE_STATUSES.includes(a.status) || new Date(a.scheduled_date) < now)
-    .sort((a, b) => new Date(b.scheduled_date).getTime() - new Date(a.scheduled_date).getTime())
+    .filter((a) => !ACTIVE_STATUSES.includes(a.status) || a.scheduled_date < nowStr)
+    .sort((a, b) => b.scheduled_date.localeCompare(a.scheduled_date))
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
