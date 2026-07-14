@@ -110,57 +110,60 @@ export default function Panel() {
           <section>
             <h2 className="mb-3 text-sm font-semibold text-txt-muted">Trámites pendientes de revisión</h2>
             {caseFiles.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border bg-white px-6 py-16 text-center">
-          <svg className="mx-auto mb-4 h-12 w-12 text-txt-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-          </svg>
-          <h3 className="mb-2 text-lg font-semibold text-txt">No hay trámites pendientes</h3>
-          <p className="text-sm text-txt-muted">
-            Cuando los ciudadanos envíen trámites, aparecerán aquí para su revisión.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {caseFiles.map((cf) => {
-            const createdDate = new Date(cf.created_at).toLocaleDateString('es-PE', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric',
-            })
-
-            return (
-              <div
-                key={cf.id}
-                className="cursor-pointer rounded-lg border border-border bg-white shadow-sm transition hover:border-primary/30 hover:shadow-md"
-                onClick={() => navigate(`/panel/${cf.id}`)}
-              >
-                <div className="px-5 py-4">
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${CaseFileStatusColors[cf.status]}`}>
-                      {CaseFileStatusLabels[cf.status]}
-                    </span>
-                    <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${RiskLevelColors[cf.risk_level]}`}>
-                      Riesgo: {RiskLevelLabels[cf.risk_level]}
-                    </span>
-                  </div>
-
-                  <h3 className="text-base font-semibold text-txt">{cf.tracking_code}</h3>
-                  <p className="text-sm text-txt-muted">{ProcedureTypeLabels[cf.procedure_type]}</p>
-
-                  <InfoSep items={[cf.company_name, cf.establishment_name, createdDate]} />
-                </div>
-
-                <div className="border-t border-border px-5 py-3 bg-surface/30">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); navigate(`/panel/${cf.id}`) }}
-                    className="w-full rounded-md border border-primary bg-white px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/5"
-                  >
-                    Revisar trámite
-                  </button>
-                </div>
+              <div className="rounded-lg border border-dashed border-border bg-white px-6 py-16 text-center">
+                <svg className="mx-auto mb-4 h-12 w-12 text-txt-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                </svg>
+                <h3 className="mb-2 text-lg font-semibold text-txt">No hay trámites pendientes</h3>
+                <p className="text-sm text-txt-muted">
+                  Cuando los ciudadanos envíen trámites, aparecerán aquí para su revisión.
+                </p>
               </div>
-            )
-          })}
+            ) : (
+              <div className="space-y-3">
+                {caseFiles.map((cf) => {
+                  const createdDate = new Date(cf.created_at).toLocaleDateString('es-PE', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })
+
+                  return (
+                    <div
+                      key={cf.id}
+                      className="cursor-pointer rounded-lg border border-border bg-white shadow-sm transition hover:border-primary/30 hover:shadow-md"
+                      onClick={() => navigate(`/panel/${cf.id}`)}
+                    >
+                      <div className="px-5 py-4">
+                        <div className="mb-2 flex items-center gap-2">
+                          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${CaseFileStatusColors[cf.status]}`}>
+                            {CaseFileStatusLabels[cf.status]}
+                          </span>
+                          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${RiskLevelColors[cf.risk_level]}`}>
+                            Riesgo: {RiskLevelLabels[cf.risk_level]}
+                          </span>
+                        </div>
+
+                        <h3 className="text-base font-semibold text-txt">{cf.tracking_code}</h3>
+                        <p className="text-sm text-txt-muted">{ProcedureTypeLabels[cf.procedure_type]}</p>
+
+                        <InfoSep items={[cf.company_name, cf.establishment_name, createdDate]} />
+                      </div>
+
+                      <div className="border-t border-border px-5 py-3 bg-surface/30">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); navigate(`/panel/${cf.id}`) }}
+                          className="w-full rounded-md border border-primary bg-white px-4 py-2 text-sm font-medium text-primary transition hover:bg-primary/5"
+                        >
+                          Revisar trámite
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </section>
         </div>
       )}
 
