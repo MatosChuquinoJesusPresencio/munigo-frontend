@@ -17,7 +17,7 @@ export default function AppointmentCard({
   onReschedule,
   loading,
 }: AppointmentCardProps) {
-  const date = new Date(appointment.scheduled_date).toLocaleDateString('es-PE', {
+  const date = new Date(appointment.scheduled_date + 'T00:00:00').toLocaleDateString('es-PE', {
     weekday: 'long',
     day: '2-digit',
     month: 'long',
