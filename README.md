@@ -2,6 +2,11 @@
 
 SPA municipal para la gestión de trámites, citas, inspecciones y notificaciones del Area de Desarrollo Económico y la Subgerencia de Comercialización de los Olivos.
 
+## Despliegue
+
+- **URL**: https://munigo-frontend-production.up.railway.app/
+- **Plataforma**: Railway
+
 ## Stack
 
 - **React** 19.2
