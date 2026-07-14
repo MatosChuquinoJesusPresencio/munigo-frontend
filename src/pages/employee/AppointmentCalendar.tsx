@@ -224,7 +224,7 @@ export default function AppointmentCalendar() {
                 .map((a) => (
                   <button
                     key={a.id}
-                    onClick={() => navigate(`/funcionario/expedientes/${a.case_file}`)}
+                    onClick={() => navigate(`/panel/${a.case_file}`)}
                     className="w-full rounded-md border border-border p-3 text-left transition hover:border-primary/50 hover:bg-surface/50"
                   >
                     <div className="mb-1 flex items-center justify-between">
