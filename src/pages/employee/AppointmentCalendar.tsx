@@ -5,6 +5,7 @@ import type { Appointment } from '../../types/appointment'
 import { AppointmentStatusLabels, AppointmentStatusColors } from '../../types/appointment'
 import type { EmployeeUser } from '../../lib/employee.service'
 import { useNavigate } from 'react-router'
+import RespondRescheduleModal from '../../components/appointments/RespondRescheduleModal'
 
 const WEEKDAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
@@ -31,6 +32,7 @@ export default function AppointmentCalendar() {
   const [currentMonth, setCurrentMonth] = useState(today.getMonth())
   const [currentYear, setCurrentYear] = useState(today.getFullYear())
   const [selectedDay, setSelectedDay] = useState<string | null>(null)
+  const [rescheduleTarget, setRescheduleTarget] = useState<Appointment | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -114,6 +116,22 @@ export default function AppointmentCalendar() {
   })
 
   const selectedAppointments = selectedDay ? (appointmentsByDate[selectedDay] ?? []) : []
+
+  async function reloadAppointments() {
+    const firstDay = formatDateKey(currentYear, currentMonth, 1)
+    const lastDay = formatDateKey(currentYear, currentMonth, getDaysInMonth(currentYear, currentMonth))
+    try {
+      const params: { start: string; end: string; inspector_id?: number } = {
+        start: firstDay,
+        end: lastDay,
+      }
+      if (selectedInspector) params.inspector_id = selectedInspector
+      const data = await appointmentService.getCalendar(params)
+      setAppointments(data)
+    } catch {
+      // silent
+    }
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
@@ -242,12 +260,27 @@ export default function AppointmentCalendar() {
                     {a.inspector_name && (
                       <p className="text-xs text-txt-muted">Inspector: {a.inspector_name}</p>
                     )}
+                    {a.status === 'PENDIENTE_REPROGRAMACION' && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setRescheduleTarget(a) }}
+                        className="mt-2 w-full rounded-md bg-orange-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-orange-700"
+                      >
+                        Responder solicitud
+                      </button>
+                    )}
                   </button>
                 ))}
             </div>
           )}
         </div>
       </div>
+
+      <RespondRescheduleModal
+        isOpen={!!rescheduleTarget}
+        appointment={rescheduleTarget}
+        onConfirm={reloadAppointments}
+        onClose={() => setRescheduleTarget(null)}
+      />
     </div>
   )
 }
